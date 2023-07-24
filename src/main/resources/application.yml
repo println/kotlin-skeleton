@@ -26,9 +26,6 @@ spring:
         qualifier-delimiter: _
         max-page-size: 2000
 
-security:
-  ignored=/**:
-
 management:
   endpoints:
     web:
