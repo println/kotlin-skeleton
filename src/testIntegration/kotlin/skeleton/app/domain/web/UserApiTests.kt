@@ -1,22 +1,22 @@
 package skeleton.app.domain.web
 
-import skeleton.app.AbstractWebTest
-import skeleton.app.configuration.constants.ResourcePaths
-import skeleton.app.support.eventsourcing.connectors.dummy.DummyProducerConnector
-import skeleton.app.support.extensions.ClassExtensions.toJsonString
-import skeleton.app.support.extensions.ClassExtensions.toObject
-import gsl.schemas.OrderEvent
-import gsl.schemas.OrderEventStatus
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import skeleton.app.domain.user.*
-import skeleton.app.domain.user.web.*
+import skeleton.app.AbstractWebTest
+import skeleton.app.configuration.constants.ResourcePaths
+import skeleton.app.domain.user.User
+import skeleton.app.domain.user.UserRepository
+import skeleton.app.domain.user.UserStatus
+import skeleton.app.domain.user.web.UserController
+import skeleton.app.domain.user.web.UserDto
+import skeleton.app.domain.user.web.UserWebService
+import skeleton.app.support.extensions.ClassExtensions.toJsonString
+import skeleton.app.support.extensions.ClassExtensions.toObject
 import java.util.*
 
 class UserApiTests : AbstractWebTest<User>() {
@@ -70,9 +70,6 @@ class UserApiTests : AbstractWebTest<User>() {
 
         assertTotalMessagesAndReleaseThem(2)
 
-        val eventContent = DummyProducerConnector.getMessageContent(OrderEvent::class)
-        Assertions.assertEquals(OrderEventStatus.WAITING_PAYMENT, eventContent?.status)
-        Assertions.assertEquals(order.id, eventContent?.trackId)
 
         assertDocumentReleased(order)
     }

@@ -10,8 +10,7 @@ import java.util.*
 
 @Service
 class UserService(
-        private val repository: UserRepository,
-        private val messenger: UserMessenger) {
+        private val repository: UserRepository) {
 
     fun findAll(userFilter: UserFilter, pageable: Pageable): Page<User> {
         val specification: Specification<User> = Specification.where(null)
@@ -34,7 +33,6 @@ class UserService(
                 pickupAddress = pickupAddress,
                 deliveryAddress = deliveryAddress)
         val entity = repository.save(order)
-        messenger.create(entity)
         return entity
     }
 
@@ -49,7 +47,6 @@ class UserService(
         entity!!.status = UserStatus.ACCEPTED
         entity.value = value
         val updatedEntity = repository.save(entity)
-        messenger.approvePayment(updatedEntity)
         return updatedEntity
     }
 
@@ -64,7 +61,6 @@ class UserService(
         entity!!.status = UserStatus.REFUSED
         entity.comment = reason
         val updatedEntity = repository.save(entity)
-        messenger.refusePayment(updatedEntity)
         return updatedEntity
     }
 
