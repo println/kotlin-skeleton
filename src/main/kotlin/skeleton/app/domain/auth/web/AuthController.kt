@@ -1,6 +1,6 @@
 package skeleton.app.domain.auth.web
 
-import skeleton.app.domain.user.Userr
+import skeleton.app.domain.user.User
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import skeleton.app.configuration.constants.ServiceNames
@@ -30,13 +30,13 @@ class AuthController(
     @PutMapping("/{id}/approve")
     fun tempApproveOrder(
             @PathVariable("id") id: UUID,
-            @RequestBody data: PaymentDto): Userr {
+            @RequestBody data: PaymentDto): User {
         return service.approvePayment(id, data.value)
     }
 
     @PutMapping("/{id}/refuse")
     fun tempRefuseOrder(
-            @PathVariable("id") id: UUID): Userr {
+            @PathVariable("id") id: UUID): User {
         return service.refusePayment(id, "cant pay")
     }
 }

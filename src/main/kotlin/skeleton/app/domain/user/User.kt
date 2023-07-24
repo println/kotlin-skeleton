@@ -8,7 +8,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = TableNames.Domain.USER)
-data class Userr(
+data class User(
         val customerId: UUID,
         val pickupAddress: String,
         val deliveryAddress: String,
@@ -16,4 +16,4 @@ data class Userr(
         var comment: String = "",
         @Enumerated(EnumType.STRING)
         var status: UserStatus = UserStatus.WAITING_PAYMENT,
-) : AuditableModel<Userr>()
+) : AuditableModel<User>()

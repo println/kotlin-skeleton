@@ -1,6 +1,6 @@
 package skeleton.app.domain.user.web
 
-import skeleton.app.domain.user.Userr
+import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserFilter
 import skeleton.app.domain.user.UserService
 import skeleton.app.support.web.AbstractWebService
@@ -11,27 +11,27 @@ import java.math.BigDecimal
 import java.util.*
 
 @Service
-class UserWebService(private val service: UserService): AbstractWebService<Userr>() {
-    fun findAll(filter: UserFilter, pageable: Pageable): Page<Userr> {
+class UserWebService(private val service: UserService): AbstractWebService<User>() {
+    fun findAll(filter: UserFilter, pageable: Pageable): Page<User> {
         return service.findAll(filter, pageable)
     }
 
-    fun findById(id: UUID): Userr {
+    fun findById(id: UUID): User {
         val nullableEntity = service.findById(id)
         return assertNotFound(nullableEntity)
     }
 
-    fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): Userr {
+    fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): User {
         val nullableEntity = service.createOrder(customerId, pickupAddress, deliveryAddress)
         return assertBadRequest(nullableEntity)
     }
 
-    fun approvePayment(orderId: UUID, value: BigDecimal): Userr {
+    fun approvePayment(orderId: UUID, value: BigDecimal): User {
         val nullableEntity = service.approvePayment(orderId, value)
         return assertBadRequest(nullableEntity)
     }
 
-    fun refusePayment(orderId: UUID, reason: String): Userr {
+    fun refusePayment(orderId: UUID, reason: String): User {
         val nullableEntity = service.refusePayment(orderId, reason)
         return assertBadRequest(nullableEntity)
     }

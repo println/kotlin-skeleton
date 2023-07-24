@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface UserRepository : JpaRepository<Userr, UUID>, JpaSpecificationExecutor<Userr> {
-    fun findAllByCustomerId(customerId: UUID, specification: Specification<Userr>, pageable: Pageable): Page<Userr>
+interface UserRepository : JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
+    fun findAllByCustomerId(customerId: UUID, specification: Specification<User>, pageable: Pageable): Page<User>
 }

@@ -6,13 +6,13 @@ import java.math.BigDecimal
 
 
 object UserValidations {
-    fun canApprove(value: BigDecimal, entity: Userr?) =
+    fun canApprove(value: BigDecimal, entity: User?) =
             (entity != null)
                     .and(value > BigDecimal.ZERO)
                     .and(entity!!.status.canChangeTo(ACCEPTED))
 
 
-    fun canRefuse(reason: String, entity: Userr?) =
+    fun canRefuse(reason: String, entity: User?) =
             (entity != null)
                     .and(reason.isNotBlank())
                     .and(entity!!.status.canChangeTo(REFUSED))
