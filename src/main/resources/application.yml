@@ -1,20 +1,35 @@
 server:
-  port: \${PORT:8081}
+  port : ${PORT:8085}
 
 spring:
   application:
-    name: ${rootProject.name}
+    name: @project.name@
+  h2:
+    console:
+      settings:
+        web-allow-others: 'false'
+        trace: 'false'
+      path: /h2-console
   datasource:
-    url: jdbc:\${DATABASE_JDBC_URI:postgresql://192.168.0.2:5432/\${spring.application.name}db}
-    username: \${DATABASE_USER:gsl}
-    password: \${DATABASE_PASS:gsl}
+    url: jdbc:h2:mem:order-db;Mode=Oracle;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    jdbc:
-      lob:
-        non_contextual_creation: true
-    hibernate:
-      ddl-auto: update
+  sql:
+    init:
+      platform: h2
+      continue-on-error: 'true'
+
+#  datasource:
+#    url: jdbc:${DATABASE_JDBC_URI:postgresql://192.168.0.2:5432/${spring.application.name}db}
+#    username: ${DATABASE_USER:gsl}
+#    password: ${DATABASE_PASS:gsl}
+#  jpa:
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    jdbc:
+#      lob:
+#        non_contextual_creation: true
+#    hibernate:
+#      ddl-auto: update
   data:
     web:
       pageable:
