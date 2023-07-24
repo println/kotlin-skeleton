@@ -12,23 +12,23 @@ import java.util.*
 class UserService(
         private val repository: UserRepository) {
 
-    fun findAll(userFilter: UserFilter, pageable: Pageable): Page<User> {
-        val specification: Specification<User> = Specification.where(null)
+    fun findAll(userFilter: UserFilter, pageable: Pageable): Page<Userr> {
+        val specification: Specification<Userr> = Specification.where(null)
         return repository.findAll(specification, pageable)
     }
 
-    fun findAllByIdAndCustomerId(customerId: UUID, userFilter: UserFilter, pageable: Pageable): Page<User> {
-        val specification: Specification<User> = Specification.where(null)
+    fun findAllByIdAndCustomerId(customerId: UUID, userFilter: UserFilter, pageable: Pageable): Page<Userr> {
+        val specification: Specification<Userr> = Specification.where(null)
         return repository.findAllByCustomerId(customerId, specification, pageable)
     }
 
-    fun findById(id: UUID): User? {
+    fun findById(id: UUID): Userr? {
        return repository.findById(id).orElse(null)
     }
 
     @Transactional
-    fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): User? {
-        val order = User(
+    fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): Userr? {
+        val order = Userr(
                 customerId = customerId,
                 pickupAddress = pickupAddress,
                 deliveryAddress = deliveryAddress)
@@ -37,7 +37,7 @@ class UserService(
     }
 
     @Transactional
-    fun approvePayment(id: UUID, value: BigDecimal): User? {
+    fun approvePayment(id: UUID, value: BigDecimal): Userr? {
         val entity = findById(id)
 
         if (!UserValidations.canApprove(value, entity)) {
@@ -51,7 +51,7 @@ class UserService(
     }
 
     @Transactional
-    fun refusePayment(id: UUID, reason: String): User? {
+    fun refusePayment(id: UUID, reason: String): Userr? {
         val entity = findById(id)
 
         if (!UserValidations.canRefuse(reason, entity)) {

@@ -28,8 +28,8 @@ spring:
 #    jdbc:
 #      lob:
 #        non_contextual_creation: true
-#    hibernate:
-#      ddl-auto: update
+  hibernate:
+    ddl-auto: none
   data:
     web:
       pageable:

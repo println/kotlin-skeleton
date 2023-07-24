@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import skeleton.app.AbstractWebTest
 import skeleton.app.configuration.constants.ResourcePaths
-import skeleton.app.domain.user.User
+import skeleton.app.domain.user.Userr
 import skeleton.app.domain.user.UserRepository
 import skeleton.app.domain.user.UserStatus
 import skeleton.app.domain.user.web.UserController
@@ -19,10 +19,10 @@ import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import skeleton.app.support.extensions.ClassExtensions.toObject
 import java.util.*
 
-class UserApiTests : AbstractWebTest<User>() {
+class UserApiTests : AbstractWebTest<Userr>() {
 
     companion object {
-        const val RESOURCE = ResourcePaths.ORDER
+        const val RESOURCE = ResourcePaths.USER
     }
 
     @Autowired
@@ -33,8 +33,8 @@ class UserApiTests : AbstractWebTest<User>() {
 
 
     override fun getRepository() = repository
-    override fun getEntityType() = User::class.java
-    override fun preProcessing(data: User) {
+    override fun getEntityType() = Userr::class.java
+    override fun preProcessing(data: Userr) {
         data.status = UserStatus.WAITING_PAYMENT
     }
 
@@ -50,7 +50,7 @@ class UserApiTests : AbstractWebTest<User>() {
     }
 
     @Test
-    fun createOrder() {
+    fun create() {
         val customerId = UUID.randomUUID()
         val pickupAddress = "pickupAddress"
         val destination = "destination"
@@ -66,12 +66,11 @@ class UserApiTests : AbstractWebTest<User>() {
                 .andExpect(header().exists("Location"))
                 .andReturn()
 
-        val order: User = result.response.contentAsString.toObject()
+        val entity: Userr = result.response.contentAsString.toObject()
 
         assertTotalMessagesAndReleaseThem(2)
 
-
-        assertDocumentReleased(order)
+        assertDocumentReleased(entity)
     }
 
 

@@ -1,6 +1,6 @@
 package skeleton.app.domain.user.web
 
-import skeleton.app.domain.user.User
+import skeleton.app.domain.user.Userr
 import skeleton.app.domain.user.UserFilter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,20 +22,20 @@ class UserController(val service: UserWebService) {
     @GetMapping
     fun getAll(
             @RequestParam(required = false) coordinates: String?,
-            pageable: Pageable): Page<User> {
+            pageable: Pageable): Page<Userr> {
         val filter = UserFilter()
         return service.findAll(filter, pageable)
     }
 
     @GetMapping("/{id}")
     fun getById(
-            @PathVariable("id") id: UUID): User {
+            @PathVariable("id") id: UUID): Userr {
         return service.findById(id)
     }
 
     @PostMapping
     fun createOrder(
-            @RequestBody data: UserDto): ResponseEntity<User> {
+            @RequestBody data: UserDto): ResponseEntity<Userr> {
         val entity = service.createOrder(data.customerId, data.pickupAddress, data.deliveryAddress)
 
         val location: URI = ServletUriComponentsBuilder
@@ -49,13 +49,13 @@ class UserController(val service: UserWebService) {
     @PutMapping("/{id}/approve")
     fun tempApproveOrder(
             @PathVariable("id") id: UUID,
-            @RequestBody data: PaymentDto): User {
+            @RequestBody data: PaymentDto): Userr {
         return service.approvePayment(id, data.value)
     }
 
     @PutMapping("/{id}/refuse")
     fun tempRefuseOrder(
-            @PathVariable("id") id: UUID): User {
+            @PathVariable("id") id: UUID): Userr {
         return service.refusePayment(id, "cant pay")
     }
 }
