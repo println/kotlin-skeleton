@@ -132,7 +132,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.basedir}/src/testIntegration/kotlin</source>
+                                <source>${project.basedir}/src/test-integration/kotlin</source>
                             </sources>
                         </configuration>
                     </execution>
