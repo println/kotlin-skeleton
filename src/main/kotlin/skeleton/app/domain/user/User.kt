@@ -4,7 +4,7 @@ import skeleton.app.configuration.constants.TableNames
 import skeleton.app.support.jpa.AuditableModel
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = TableNames.Domain.USER)

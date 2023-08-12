@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
 @ActiveProfiles("test", "integration-test")
 @SpringBootTest(properties = ["spring.main.allow-bean-definition-overriding=true"])
-abstract class AbstractIntegrationTest {
+abstract class AbstractIT {
 
     @Autowired
     lateinit var pageable: PageableHandlerMethodArgumentResolver

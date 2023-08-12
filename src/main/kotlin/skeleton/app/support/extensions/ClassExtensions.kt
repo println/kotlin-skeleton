@@ -14,7 +14,7 @@ object ClassExtensions {
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
     fun <R : Any> R.logger(): Logger {
-        return LoggerFactory.getLogger((this.javaClass).name)
+        return LoggerFactory.getLogger((this::class).java.name)
     }
 
     fun <R : Any> R.toJsonString(): String {

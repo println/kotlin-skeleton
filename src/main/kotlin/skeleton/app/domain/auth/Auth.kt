@@ -4,10 +4,10 @@ import skeleton.app.configuration.constants.TableNames
 import skeleton.app.support.jpa.AuditableModel
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Table
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = TableNames.Domain.USER)

@@ -6,7 +6,7 @@ spring:
         trace: 'false'
       path: /h2-console
   datasource:
-    url: jdbc:h2:mem:skeleton-db;Mode=Oracle;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:skeleton-db;Mode=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE,USER
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   sql:

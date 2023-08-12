@@ -12,9 +12,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
-import kotlin.streams.toList
 
-abstract class AbstractWebTest<T : AuditableModel<T>> : AbstractIntegrationTest() {
+abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
     val easyRandom = EasyRandom()
     var entities = listOf<AuditableModel<T>>()
 

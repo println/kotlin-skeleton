@@ -7,7 +7,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import skeleton.app.AbstractWebTest
+import skeleton.app.AbstractWebIT
 import skeleton.app.configuration.constants.ResourcePaths
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserRepository
@@ -18,7 +18,7 @@ import skeleton.app.domain.user.web.UserWebService
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import java.util.*
 
-class UserApiTests : AbstractWebTest<User>() {
+class UserApiTests : AbstractWebIT<User>() {
 
     companion object {
         const val RESOURCE = ResourcePaths.USER
