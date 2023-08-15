@@ -2,30 +2,27 @@ package skeleton.app.configuration.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
+import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import skeleton.app.domain.account.AccountRepository
-import skeleton.app.support.jwt.JwtAuthenticationFilter
-import kotlin.jvm.optionals.getOrNull
+import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.core.auth.jwt.JwtAuthFilter
 
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 class SecurityConfig(
-        private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-        private val authenticationProvider: AuthenticationProvider
+        private val jwtAuthFilter: JwtAuthFilter,
+        private val authenticationProvider: AuthenticationProvider,
+        private val logoutHandler: LogoutHandler
 ) {
     @Bean
     fun formLoginFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -48,10 +45,11 @@ class SecurityConfig(
                 }
                 .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
                 .logout { logout ->
-                    logout.logoutUrl("/logout")
-                            .logoutSuccessHandler(HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                    logout.logoutUrl("${Endpoints.AUTH}/logout")
+                            .addLogoutHandler(logoutHandler)
+                            .logoutSuccessHandler(({ _, _, _ -> SecurityContextHolder.clearContext() }))
                             .invalidateHttpSession(true)
                 }
                 .build()

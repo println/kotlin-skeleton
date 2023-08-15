@@ -1,8 +1,13 @@
 package skeleton.app.configuration.constants
 
 object TableNames {
-    object System {
+    object Core {
         const val USER = "users"
         const val ACCOUNT = "accounts"
+        const val TOKEN = "tokens"
+    }
+
+    object Domain {
+
     }
 }
