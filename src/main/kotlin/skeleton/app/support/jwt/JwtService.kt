@@ -6,22 +6,14 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.stereotype.Service
 import java.security.Key
 import java.util.*
 
-
-@Service
-class JwtService {
-
-    @Value("\${custom.jwt.secret}")
-    lateinit var secretKey: String
-
-    @Value("\${custom.jwt.expiration}")
-    lateinit var expirationTime: Number
-
+class JwtService(
+        private val secretKey: String,
+        private val expirationTime: Number
+) {
     fun extractUsername(token: String): String = extractClaim(token, Claims::getSubject)
 
     fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {
@@ -30,19 +22,19 @@ class JwtService {
     }
 
     fun generateToken(extraClaims: Map<String, Any>, userDetails: UserDetails): String = Jwts.builder()
-        .setClaims(extraClaims)
-        .setSubject(userDetails.username)
-        .setIssuedAt(Date(System.currentTimeMillis()))
-        .setExpiration(Date(System.currentTimeMillis() + expirationTime.toLong()))
-        .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-        .compact()
+            .setClaims(extraClaims)
+            .setSubject(userDetails.username)
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + expirationTime.toLong()))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact()
 
     private fun extractAllClaims(token: String): Claims = Jwts
-        .parserBuilder()
-        .setSigningKey(getSignInKey())
-        .build()
-        .parseClaimsJws(token) //json web signature
-        .body
+            .parserBuilder()
+            .setSigningKey(getSignInKey())
+            .build()
+            .parseClaimsJws(token) //json web signature
+            .body
 
     fun generateToken(userDetails: UserDetails): String = generateToken(HashMap(), userDetails)
 

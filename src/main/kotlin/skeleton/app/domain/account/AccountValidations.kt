@@ -4,7 +4,7 @@ import skeleton.app.domain.account.web.RegisterRequestDTO
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserValidations
 
-object RegisterRequestValidations {
+object AccountValidations {
     fun canRegister(entity: RegisterRequestDTO?) =
         (entity != null)
             .and(isValidEmail(entity!!.email))
