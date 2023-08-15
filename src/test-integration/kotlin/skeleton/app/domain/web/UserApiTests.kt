@@ -34,7 +34,7 @@ class UserApiTests : AbstractWebIT<User>() {
     override fun getRepository() = repository
     override fun getEntityType() = User::class.java
     override fun preProcessing(data: User) {
-        data.status = UserStatus.WAITING_PAYMENT
+        //data.status = UserStatus.WAITING_PAYMENT
     }
 
     override fun getResource() = RESOURCE

@@ -17,11 +17,6 @@ class UserService(
         return repository.findAll(specification, pageable)
     }
 
-    fun findAllByIdAndCustomerId(customerId: UUID, userFilter: UserFilter, pageable: Pageable): Page<User> {
-        val specification: Specification<User> = Specification.where(null)
-        return repository.findAllByCustomerId(customerId, specification, pageable)
-    }
-
     fun findById(id: UUID): User? {
        return repository.findById(id).orElse(null)
     }
@@ -29,9 +24,8 @@ class UserService(
     @Transactional
     fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): User? {
         val order = User(
-                customerId = customerId,
-                pickupAddress = pickupAddress,
-                deliveryAddress = deliveryAddress)
+                firstName = pickupAddress,
+                lastName = deliveryAddress)
         val entity = repository.save(order)
         return entity
     }
@@ -40,28 +34,27 @@ class UserService(
     fun approvePayment(id: UUID, value: BigDecimal): User? {
         val entity = findById(id)
 
-        if (!UserValidations.canApprove(value, entity)) {
-            return null
-        }
+//        if (!UserValidations.canApprove(value, entity)) {
+//            return null
+//        }
 
-        entity!!.status = UserStatus.ACCEPTED
-        entity.value = value
-        val updatedEntity = repository.save(entity)
-        return updatedEntity
+
+        //val updatedEntity = repository.save(entity)
+        return entity
     }
 
     @Transactional
     fun refusePayment(id: UUID, reason: String): User? {
         val entity = findById(id)
 
-        if (!UserValidations.canRefuse(reason, entity)) {
-            return null
-        }
-
-        entity!!.status = UserStatus.REFUSED
-        entity.comment = reason
-        val updatedEntity = repository.save(entity)
-        return updatedEntity
+//        if (!UserValidations.canRefuse(reason, entity)) {
+//            return null
+//        }
+//
+//        entity!!.status = UserStatus.REFUSED
+//        entity.comment = reason
+//        val updatedEntity = repository.save(entity)
+        return entity
     }
 
 }

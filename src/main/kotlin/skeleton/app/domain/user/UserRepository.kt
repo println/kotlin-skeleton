@@ -10,5 +10,4 @@ import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
-    fun findAllByCustomerId(customerId: UUID, specification: Specification<User>, pageable: Pageable): Page<User>
 }
