@@ -37,6 +37,8 @@ class SecurityConfig(
                                     AntPathRequestMatcher("/api/v1/auth/**"),
                                     AntPathRequestMatcher("/api/v1/user"),
                                     AntPathRequestMatcher("/api/v1/user/**"),
+                                    AntPathRequestMatcher("/api/v1/account"),
+                                    AntPathRequestMatcher("/api/v1/account/**"),
                                     AntPathRequestMatcher("/v3/api-docs"),
                                     AntPathRequestMatcher("/v3/api-docs/**"),
                                     AntPathRequestMatcher("/swagger-ui/**"),

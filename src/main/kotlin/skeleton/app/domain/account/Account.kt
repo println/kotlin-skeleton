@@ -1,10 +1,12 @@
 package skeleton.app.domain.account
 
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -18,6 +20,7 @@ data class Account(
         @Id
         val email: String,
         val pass: String,
+        @OneToOne(cascade = [CascadeType.ALL])
         var user: User?,
         @Enumerated(EnumType.STRING)
         var role: AccountRole = AccountRole.USER
