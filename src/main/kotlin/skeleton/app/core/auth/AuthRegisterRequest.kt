@@ -1,9 +1,9 @@
-package skeleton.app.core.auth.web
+package skeleton.app.core.auth
 
 import skeleton.app.core.user.User
 
 
-class RegisterRequestDTO (
+class AuthRegisterRequest (
     val email: String,
     val password: String,
     var user: User

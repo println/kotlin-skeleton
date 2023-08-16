@@ -44,10 +44,14 @@ class AccountService(
         return repository.save(entity)
     }
 
-    fun authenticate(email: String, password: String): Optional<Account> {
+    fun authenticate(email: String, password: String): Optional<Account?> {
         authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(email, password)
         )
-        return Optional.ofNullable(repository.getReferenceById(email))
+        return repository.findByEmail(email)
+    }
+
+    fun findByEmail(email: String): Optional<Account?> {
+        return repository.findByEmail(email)
     }
 }

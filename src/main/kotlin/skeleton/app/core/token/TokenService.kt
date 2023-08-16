@@ -2,6 +2,7 @@ package skeleton.app.core.token
 
 import org.springframework.stereotype.Service
 import skeleton.app.core.account.Account
+import java.util.*
 
 @Service
 class TokenService(
@@ -26,5 +27,13 @@ class TokenService(
             }
             repository.saveAll(entities)
         }
+    }
+
+    fun save(token: Token): Token {
+        return repository.save(token);
+    }
+
+    fun findByToken(token: String): Optional<Token> {
+        return repository.findByToken(token)
     }
 }

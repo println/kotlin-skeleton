@@ -7,25 +7,27 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.stereotype.Service
 import skeleton.app.core.token.TokenRepository
+import skeleton.app.core.token.TokenService
 
 @Service
 class LogoutService(
-        private val tokenRepository: TokenRepository
+        private val tokenService: TokenService
 ): LogoutHandler {
-    override fun logout(request: HttpServletRequest?, response: HttpServletResponse?, authentication: Authentication?) {
-        val authHeader = request?.getHeader("Authorization");
+    override fun logout(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
+        val authHeader = request.getHeader("Authorization");
 
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return;
+            return
         }
 
-        val jwt = authHeader.substring(7);
-        val storedToken = tokenRepository.findByToken(jwt).orElse(null)
+        val token = authHeader.substring(7);
+        val entityTokenOptional = tokenService.findByToken(token)
 
-        if (storedToken != null) {
-            storedToken.expired = true
-            storedToken.revoked = true
-            tokenRepository.save(storedToken);
+        if (entityTokenOptional.isPresent) {
+            val entityToken = entityTokenOptional.get()
+            entityToken.expired = true
+            entityToken.revoked = true
+            tokenService.save(entityToken);
             SecurityContextHolder.clearContext();
         }
     }

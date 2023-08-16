@@ -1,11 +1,11 @@
 package skeleton.app.core.account
 
-import skeleton.app.core.auth.web.RegisterRequestDTO
+import skeleton.app.core.auth.AuthRegisterRequest
 import skeleton.app.core.user.User
 import skeleton.app.core.user.UserValidations
 
 object AccountValidations {
-    fun canRegister(entity: RegisterRequestDTO?) =
+    fun canRegister(entity: AuthRegisterRequest?) =
         (entity != null)
             .and(isValidEmail(entity!!.email))
             .and(isValidPassword(entity.password))

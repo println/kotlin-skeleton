@@ -10,9 +10,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
-@ActiveProfiles("test", "integration-test")
-@SpringBootTest(properties = ["spring.main.allow-bean-definition-overriding=true"])
-abstract class AbstractIT {
+abstract class AbstractIT: TestIT() {
 
     @Autowired
     lateinit var pageable: PageableHandlerMethodArgumentResolver
@@ -31,6 +29,5 @@ abstract class AbstractIT {
         return MockMvcBuilders
                 .standaloneSetup(resource)
                 .setCustomArgumentResolvers(pageable)
-
     }
 }

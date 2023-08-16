@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional
 import skeleton.app.core.account.Account
 import skeleton.app.core.account.AccountService
 import skeleton.app.core.auth.jwt.JwtService
-import skeleton.app.core.auth.web.AuthenticationRequestDTO
-import skeleton.app.core.auth.web.RegisterRequestDTO
 import skeleton.app.core.token.TokenService
 import java.lang.RuntimeException
 import java.util.*
@@ -17,16 +15,16 @@ class AuthService(
         private val jwtService: JwtService,
         private val tokenService: TokenService) {
     @Transactional
-    fun register(registerRequest: RegisterRequestDTO): AuthTokens {
-        val account = registerNewAccount(registerRequest)
+    fun register(authRegisterRequest: AuthRegisterRequest): AuthTokens {
+        val account = registerNewAccount(authRegisterRequest)
         val tokens = generateTokens(account)
         storeAccountToken(account, tokens)
         return tokens
     }
 
     @Transactional
-    fun authenticate(authenticationRequest: AuthenticationRequestDTO): AuthTokens {
-        val accountOptional = authenticateAccount(authenticationRequest)
+    fun authenticate(authRequest: AuthRequest): AuthTokens {
+        val accountOptional = authenticateAccount(authRequest)
         if (accountOptional.isEmpty) {
             throw RuntimeException("bad request")
         }
@@ -56,17 +54,17 @@ class AuthService(
         storeAccountToken(account, tokens)
         return tokens
     }
-    private fun registerNewAccount(registerRequest: RegisterRequestDTO): Account {
-        return accountService.register(registerRequest.email, registerRequest.password, registerRequest.user)!!
+    private fun registerNewAccount(authRegisterRequest: AuthRegisterRequest): Account {
+        return accountService.register(authRegisterRequest.email, authRegisterRequest.password, authRegisterRequest.user)!!
     }
 
 
-    private fun authenticateAccount(authenticationRequest: AuthenticationRequestDTO): Optional<Account> {
-        return accountService.authenticate(authenticationRequest.email, authenticationRequest.password)
+    private fun authenticateAccount(authRequest: AuthRequest): Optional<Account?> {
+        return accountService.authenticate(authRequest.email, authRequest.password)
     }
 
-    private fun findAccountByEmail(email: String): Optional<Account>{
-        return accountService.findById(email)
+    private fun findAccountByEmail(email: String): Optional<Account?>{
+        return accountService.findByEmail(email)
     }
 
     private fun generateTokens(account: Account): AuthTokens {

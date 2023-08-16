@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import skeleton.app.configuration.constants.Endpoints
 import skeleton.app.core.auth.AuthTokens
+import skeleton.app.core.auth.AuthRequest
+import skeleton.app.core.auth.AuthRegisterRequest
 
 
 @RestController
@@ -22,19 +24,17 @@ class AuthController(
 
     @PostMapping("/register")
     fun register(
-            @RequestBody request: RegisterRequestDTO
+            @RequestBody request: AuthRegisterRequest
     ): ResponseEntity<AuthTokens> {
-        val account = authWebService.register(request)
-        val token = authWebService.generateToken(account)
+        val token = authWebService.register(request)
         return ResponseEntity((token), HttpStatus.CREATED)
     }
 
     @PostMapping("/authenticate")
     fun authenticate(
-            @RequestBody request: AuthenticationRequestDTO
+            @RequestBody request: AuthRequest
     ): ResponseEntity<AuthTokens> {
-        val account = authWebService.authenticate(request)
-        val token = authWebService.generateToken(account)
+        val token = authWebService.authenticate(request)
         return ResponseEntity.ok(token)
     }
 
