@@ -10,13 +10,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import skeleton.app.configuration.constants.Endpoints
-import skeleton.app.core.token.TokenRepository
+import skeleton.app.core.token.TokenService
 
 @Component
 class JwtAuthFilter(
         private val jwtService: JwtService,
         private val userDetailsService: UserDetailsService,
-        private val tokenRepository:TokenRepository
+        private val tokenService: TokenService
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
             request: HttpServletRequest,
@@ -41,7 +41,7 @@ class JwtAuthFilter(
         if (SecurityContextHolder.getContext().authentication == null) {
             val userDetails = userDetailsService.loadUserByUsername(userEmail)
 
-            val isTokenValid = tokenRepository.findByToken(jwt)
+            val isTokenValid = tokenService.findByToken(jwt)
                     ?.map { it -> it!!.expired && !it.revoked }
                     ?.orElse(false)
 

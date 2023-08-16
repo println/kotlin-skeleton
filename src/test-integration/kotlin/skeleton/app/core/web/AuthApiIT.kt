@@ -1,6 +1,7 @@
 package skeleton.app.core.web
 
 import org.jeasy.random.EasyRandom
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,7 +32,7 @@ class AuthApiIT : AbstractIT() {
     }
 
     @Autowired
-    private lateinit var repository: UserRepository
+    private lateinit var userRepository: UserRepository
 
     @Autowired
     private lateinit var accountRepository: AccountRepository
@@ -46,11 +47,11 @@ class AuthApiIT : AbstractIT() {
         return AuthController(authWebService)
     }
 
-    @BeforeEach
+    @AfterEach
     fun reset() {
         tokenRepository.deleteAll()
-        repository.deleteAll()
         accountRepository.deleteAll()
+        userRepository.deleteAll()
     }
 
     @Test
@@ -78,7 +79,7 @@ class AuthApiIT : AbstractIT() {
         val accounts: List<Account> = accountRepository.findAll()
         Assertions.assertTrue(accounts.size == 1)
 
-        val users: List<User> = repository.findAll()
+        val users: List<User> = userRepository.findAll()
         Assertions.assertTrue(accounts.size == 1)
 
     }

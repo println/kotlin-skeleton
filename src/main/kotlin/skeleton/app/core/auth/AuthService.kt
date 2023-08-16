@@ -6,7 +6,6 @@ import skeleton.app.core.account.Account
 import skeleton.app.core.account.AccountService
 import skeleton.app.core.auth.jwt.JwtService
 import skeleton.app.core.token.TokenService
-import java.lang.RuntimeException
 import java.util.*
 
 @Service

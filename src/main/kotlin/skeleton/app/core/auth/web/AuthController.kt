@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import skeleton.app.configuration.constants.Endpoints
-import skeleton.app.core.auth.AuthTokens
-import skeleton.app.core.auth.AuthRequest
 import skeleton.app.core.auth.AuthRegisterRequest
+import skeleton.app.core.auth.AuthRequest
+import skeleton.app.core.auth.AuthTokens
 
 
 @RestController

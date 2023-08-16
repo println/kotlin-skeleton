@@ -5,12 +5,10 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import skeleton.app.core.account.Account
+import skeleton.app.core.auth.AuthRegisterRequest
+import skeleton.app.core.auth.AuthRequest
 import skeleton.app.core.auth.AuthService
 import skeleton.app.core.auth.AuthTokens
-import skeleton.app.core.auth.AuthRequest
-import skeleton.app.core.auth.AuthRegisterRequest
-import skeleton.app.core.token.Token
 import skeleton.app.support.web.AbstractWebService
 
 

@@ -1,13 +1,13 @@
 package skeleton.app.core.user.web
 
-import skeleton.app.core.user.User
-import skeleton.app.core.user.UserFilter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.core.user.User
+import skeleton.app.core.user.UserFilter
 import java.net.URI
 import java.util.*
 
