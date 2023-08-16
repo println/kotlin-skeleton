@@ -28,7 +28,7 @@ class AuthApiIT : AbstractIT() {
     val easyRandom = EasyRandom()
 
     companion object {
-        const val RESOURCE = ResourcePaths.USER
+        const val RESOURCE = ResourcePaths.AUTH
     }
 
     @Autowired
@@ -62,7 +62,7 @@ class AuthApiIT : AbstractIT() {
 
         val data = Account(email, password, user)
 
-        val result = restMockMvc.perform(post("/api/v1/auth/register")
+        val result = restMockMvc.perform(post("${RESOURCE}/register")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(data.toJsonString()))
