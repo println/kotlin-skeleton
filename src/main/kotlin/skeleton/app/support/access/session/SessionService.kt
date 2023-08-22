@@ -10,6 +10,16 @@ import java.util.*
 @Service
 class SessionService(
         private val repository: SessionRepository) {
+
+    fun findAll(filter: SessionFilter, pageable: Pageable): Page<Session> {
+        val specification: Specification<Session> = Specification.where(null)
+        return repository.findAll(specification, pageable)
+    }
+
+    fun findById(id: UUID): Optional<Session?> {
+        return repository.findById(id)
+    }
+
     fun add(account: Account, jwtToken: String): Session {
         val session = Session(
                 accountId = account.id!!,
@@ -38,14 +48,5 @@ class SessionService(
 
     fun findByToken(token: String): Optional<Session> {
         return repository.findByToken(token)
-    }
-
-    fun findAll(filter: SessionFilter, pageable: Pageable): Page<Session> {
-        val specification: Specification<Session> = Specification.where(null)
-        return repository.findAll(specification, pageable)
-    }
-
-    fun findById(id: UUID): Optional<Session?> {
-        return repository.findById(id)
     }
 }

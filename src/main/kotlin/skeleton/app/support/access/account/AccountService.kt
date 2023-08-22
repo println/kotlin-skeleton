@@ -32,29 +32,37 @@ class AccountService(
     fun findById(id: UUID): Account {
         val entityOptional = repository.findById(id)
         if (entityOptional.isEmpty) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "entity not found")
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
         }
         return entityOptional.get()
     }
 
     fun register(@Valid register: AccountRegisterDto): Account? {
-        //validations
+        AccountPolicies.assertName(register.firstName)
+        AccountPolicies.assertName(register.lastName)
+        AccountPolicies.assertEmail(register.email)
+        AccountPolicies.assertPassword(register.password)
+
         if (repository.existsByEmail(register.email)) {
             return null
         }
 
-        val entity = Account(
+        val account = Account(
                 register.firstName,
                 register.lastName,
                 register.email,
                 Login(
                         register.email,
-                        passwordEncoder.encode(register.password))
+                        "")
         )
-        return repository.save(entity)
+        setPassword(account, register.password)
+        return repository.save(account)
     }
 
     fun update(id: UUID, @Valid updateInfo: UpdateInfoDto): Account {
+        AccountPolicies.assertName(updateInfo.firstName)
+        AccountPolicies.assertName(updateInfo.lastName)
+
         val entity = findById(id)
         entity.firstName = updateInfo.firstName
         entity.lastName = updateInfo.lastName
@@ -62,21 +70,35 @@ class AccountService(
     }
 
     fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): Account {
+        AccountPolicies.assertEmail(updateLogin.email)
+        AccountPolicies.assertPassword(updateLogin.password)
+
         val entity = findById(id)
         entity.email = updateLogin.email
         entity.login.username = updateLogin.email
-        entity.login.password = passwordEncoder.encode(updateLogin.password)
+        setPassword(entity, updateLogin.password)
         return repository.save(entity)
     }
 
-    fun authenticate(email: String, password: String): Optional<Account?> {
+    fun authenticate(email: String, password: String): Account {
         authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(email, password)
         )
-        return repository.findByEmail(email)
+        return repository.findByEmail(email).get()
     }
 
     fun findByEmail(email: String): Optional<Account?> {
         return repository.findByEmail(email)
+    }
+
+    fun changePassword(id: UUID, password: String): Account {
+        val entity = findById(id)
+        setPassword(entity, password)
+        return repository.save(entity)
+    }
+
+    private fun setPassword(account: Account, password: String) {
+        AccountPolicies.assertPassword(password)
+        account.login.password = passwordEncoder.encode(password)
     }
 }

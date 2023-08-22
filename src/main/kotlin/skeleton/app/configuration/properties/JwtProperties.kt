@@ -1,7 +1,6 @@
 package skeleton.app.configuration.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.bind.ConstructorBinding
 
 
 @ConfigurationProperties("custom.jwt")

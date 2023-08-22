@@ -13,10 +13,13 @@ import skeleton.app.AbstractWebIT
 import skeleton.app.configuration.constants.ResourcePaths
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
-import skeleton.app.support.access.account.web.*
+import skeleton.app.support.access.account.AccountService
+import skeleton.app.support.access.account.web.AccountController
+import skeleton.app.support.access.account.web.AccountWebService
+import skeleton.app.support.access.account.web.UpdateInfoDto
+import skeleton.app.support.access.account.web.UpdateLoginDto
 import skeleton.app.support.access.auth.basic.login.Login
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
-import skeleton.app.support.extensions.ClassExtensions.toObject
 
 class AccountIT : AbstractWebIT<Account>() {
 
@@ -24,17 +27,19 @@ class AccountIT : AbstractWebIT<Account>() {
     private lateinit var repository: AccountRepository
 
     @Autowired
-    private lateinit var service: AccountWebService
+    private lateinit var webService: AccountWebService
 
     @Autowired
-    private lateinit var passwordEncoder: PasswordEncoder
+    private lateinit var service: AccountService
+
     override fun getRepository() = repository
     override fun getEntityType() = Account::class.java
     override fun preProcessing(data: Account): Account {
         return generateAccount()
     }
+
     override fun getResource() = RESOURCE
-    override fun createResource(): Any = AccountController(service)
+    override fun createResource(): Any = AccountController(webService)
 
     @Test
     fun create() {
@@ -87,7 +92,7 @@ class AccountIT : AbstractWebIT<Account>() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("\$.email").value(account.email))
 
-        val updatedEntity = repository.findById(entity.id!!).get()
+        val updatedEntity = service.authenticate(account.login.username, account.login.password)
         Assertions.assertNotEquals(entity.email, updatedEntity.email)
         Assertions.assertNotEquals(entity.login.username, updatedEntity.login.username)
         Assertions.assertNotEquals(entity.login.password, updatedEntity.login.password)

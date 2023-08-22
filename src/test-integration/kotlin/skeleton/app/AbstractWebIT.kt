@@ -1,6 +1,5 @@
 package skeleton.app
 
-import skeleton.app.support.jpa.AuditableModel
 import org.hamcrest.Matchers
 import org.jeasy.random.EasyRandom
 import org.junit.jupiter.api.BeforeEach
@@ -11,9 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import skeleton.app.support.jpa.Auditable
+import skeleton.app.support.jpa.AuditableModel
 import java.util.*
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
     val easyRandom = EasyRandom()

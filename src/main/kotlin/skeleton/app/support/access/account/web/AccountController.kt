@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import skeleton.app.configuration.constants.Endpoints
 import skeleton.app.domain.user.UserFilter
 import java.net.URI
-import java.util.UUID
+import java.util.*
 
 
 @RequestMapping(Endpoints.ACCOUNT, Endpoints.ACCOUNT_)

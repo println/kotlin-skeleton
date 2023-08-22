@@ -12,8 +12,8 @@ import skeleton.app.AbstractIT
 import skeleton.app.configuration.constants.ResourcePaths
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserRepository
-import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
+import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthTokens
 import skeleton.app.support.access.auth.basic.auth.web.AuthController
@@ -37,13 +37,16 @@ class AuthApiIT : AbstractIT() {
     private lateinit var sessionRepository: SessionRepository
 
     @Autowired
-    private lateinit var authWebService: AuthWebService
+    private lateinit var webService: AuthWebService
+
+    @Autowired
+    private lateinit var accountService: AccountService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
 
     override fun createResource(): Any {
-        return AuthController(authWebService)
+        return AuthController(webService)
     }
 
     @BeforeEach
@@ -68,14 +71,13 @@ class AuthApiIT : AbstractIT() {
         Assertions.assertNotNull(authTokens.accessToken)
         Assertions.assertNotNull(authTokens.refreshToken)
 
-        val sessions: List<Session> = sessionRepository.findAll()
-        Assertions.assertTrue(sessions.size == 1)
+        val entitySessions: List<Session> = sessionRepository.findAll()
+        Assertions.assertTrue(entitySessions.size == 1)
 
-        val accounts: List<Account> = accountRepository.findAll()
-        Assertions.assertTrue(accounts.size == 1)
-
-        val users: List<User> = userRepository.findAll()
-        Assertions.assertTrue(users.isEmpty())
+        accountService.authenticate(data.login.username, data.login.password)
+        
+        val entityUsers: List<User> = userRepository.findAll()
+        Assertions.assertTrue(entityUsers.isEmpty())
 
     }
 
@@ -97,8 +99,8 @@ class AuthApiIT : AbstractIT() {
         Assertions.assertNotNull(authTokens.accessToken)
         Assertions.assertNotNull(authTokens.refreshToken)
 
-        val sessions: List<Session> = sessionRepository.findAll()
-        Assertions.assertTrue(sessions.size == 1)
+        val entitySessions: List<Session> = sessionRepository.findAll()
+        Assertions.assertTrue(entitySessions.size == 1)
     }
 
     companion object {

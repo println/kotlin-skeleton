@@ -6,6 +6,7 @@ object TableNames {
         const val ACCOUNT = "accounts"
         const val SESSION = "session"
         const val LOGIN = "login"
+        const val RECOVERY = "recovery"
     }
 
     object Domain {

@@ -1,12 +1,12 @@
 package skeleton.app.support.web
 
-import skeleton.app.support.extensions.ClassExtensions.toJsonString
-import skeleton.app.support.extensions.ClassExtensions.toObject
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import skeleton.app.support.extensions.ClassExtensions.toJsonString
+import skeleton.app.support.extensions.ClassExtensions.toObject
 
 class ResponsePage : PageImpl<String> {
     @JsonCreator

@@ -3,12 +3,13 @@ package skeleton.app.configuration.constants
 object Endpoints {
     private const val V1 = "api/v1"
     const val USER = "${V1}/user"
-    const val USER_ = "${V1}/user/"
+    const val USER_ = "${USER}/"
     const val AUTH = "${V1}/auth"
-    const val AUTH_ = "${V1}/auth/"
+    const val AUTH_ = "${AUTH}/"
     const val ACCOUNT = "${V1}/account"
-    const val ACCOUNT_ = "${V1}/account/"
+    const val ACCOUNT_ = "${ACCOUNT}/"
     const val SESSION = "${V1}/session/"
-    const val SESSION_ = "${V1}/session/"
-
+    const val SESSION_ = "${SESSION}/"
+    const val RECOVERY = "${V1}/recovery/"
+    const val RECOVERY_ = "${RECOVERY}/"
 }

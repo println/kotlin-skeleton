@@ -1,12 +1,9 @@
 package skeleton.app.support.access.auth.basic.auth
 
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.logout.LogoutHandler
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.account.web.AccountRegisterDto
@@ -29,12 +26,7 @@ class AuthService(
 
     @Transactional
     fun authenticate(authRequest: AuthRequest): AuthTokens {
-        val accountOptional = authenticateAccount(authRequest)
-        if (accountOptional.isEmpty) {
-            throw RuntimeException("bad request")
-        }
-
-        val account = accountOptional.get()
+        val account = authenticateAccount(authRequest)
         val tokens = generateTokens(account)
         revokeAllTokens(account)
         storeAccountToken(account, tokens)
@@ -46,12 +38,12 @@ class AuthService(
         val accountEmail = jwtService.extractUsername(refreshToken)
         val accountOptional = findAccountByEmail(accountEmail)
         if (accountOptional.isEmpty) {
-            throw RuntimeException("bad request")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
 
         val account = accountOptional.get()
         if (!jwtService.isTokenValid(refreshToken, account)) {
-            throw RuntimeException("bad request")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
 
         val tokens = generateTokens(account)
@@ -59,8 +51,6 @@ class AuthService(
         storeAccountToken(account, tokens)
         return tokens
     }
-
-
 
     private fun registerNewAccount(authRegisterRequest: AuthRegisterRequest): Account {
         return accountService.register(AccountRegisterDto(
@@ -70,8 +60,7 @@ class AuthService(
                 authRegisterRequest.password))!!
     }
 
-
-    private fun authenticateAccount(authRequest: AuthRequest): Optional<Account?> {
+    private fun authenticateAccount(authRequest: AuthRequest): Account {
         return accountService.authenticate(authRequest.email, authRequest.password)
     }
 

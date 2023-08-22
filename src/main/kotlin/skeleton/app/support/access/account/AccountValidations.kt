@@ -1,8 +1,8 @@
 package skeleton.app.support.access.account
 
-import skeleton.app.support.access.auth.basic.auth.AuthRegisterRequest
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserValidations
+import skeleton.app.support.access.auth.basic.auth.AuthRegisterRequest
 
 object AccountValidations {
     fun canRegister(entity: AuthRegisterRequest?) =

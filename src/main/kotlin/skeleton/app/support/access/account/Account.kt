@@ -6,9 +6,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import skeleton.app.configuration.constants.TableNames
-import skeleton.app.domain.user.User
 import skeleton.app.support.access.auth.basic.login.Login
-import skeleton.app.support.jpa.Auditable
 import skeleton.app.support.jpa.AuditableModel
 
 @Entity

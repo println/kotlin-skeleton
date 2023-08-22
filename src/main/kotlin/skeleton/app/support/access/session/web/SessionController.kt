@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import skeleton.app.configuration.constants.Endpoints
-import skeleton.app.domain.user.User
 import skeleton.app.support.access.session.Session
 import skeleton.app.support.access.session.SessionFilter
-import skeleton.app.support.access.session.SessionService
 import java.util.*
 
 @RequestMapping(Endpoints.SESSION, Endpoints.SESSION_)

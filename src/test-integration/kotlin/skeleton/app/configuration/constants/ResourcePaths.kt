@@ -5,4 +5,5 @@ object ResourcePaths {
     const val AUTH = "/" + Endpoints.AUTH
     const val ACCOUNT = "/" + Endpoints.ACCOUNT
     const val SESSION = "/" + Endpoints.SESSION
+    const val RECOVERY = "/" + Endpoints.RECOVERY
 }
