@@ -11,7 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import skeleton.app.support.jpa.Auditable
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
     val easyRandom = EasyRandom()
@@ -19,7 +21,8 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
 
     abstract fun getRepository(): JpaRepository<T, *>
     abstract fun getEntityType(): Class<T>
-    abstract fun preProcessing(data: T): Unit
+    open fun preProcessing(data: T) = data
+
     abstract fun getResource(): String
 
     @BeforeEach
@@ -27,11 +30,11 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
         reloadData { preProcessing(it) }
     }
 
-    fun reloadData(adjustment: (T) -> Unit) {
+    fun reloadData(adjustment: (T) -> T) {
         val data = easyRandom.objects(getEntityType(), 200).toList()
-        data.forEach { adjustment(it) }
+        val processedData = data.map { adjustment(it) }
         getRepository().deleteAll()
-        entities = getRepository().saveAllAndFlush(data)
+        entities = getRepository().saveAllAndFlush(processedData)
     }
 
     @ParameterizedTest

@@ -4,7 +4,8 @@ object TableNames {
     object Core {
         const val USER = "users"
         const val ACCOUNT = "accounts"
-        const val TOKEN = "tokens"
+        const val SESSION = "session"
+        const val LOGIN = "login"
     }
 
     object Domain {

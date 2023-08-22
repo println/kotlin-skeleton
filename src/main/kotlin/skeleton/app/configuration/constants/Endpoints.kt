@@ -8,4 +8,7 @@ object Endpoints {
     const val AUTH_ = "${V1}/auth/"
     const val ACCOUNT = "${V1}/account"
     const val ACCOUNT_ = "${V1}/account/"
+    const val SESSION = "${V1}/session/"
+    const val SESSION_ = "${V1}/session/"
+
 }

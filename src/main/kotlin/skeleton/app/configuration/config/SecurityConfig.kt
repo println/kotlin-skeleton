@@ -2,6 +2,7 @@ package skeleton.app.configuration.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -13,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import skeleton.app.configuration.constants.Endpoints
-import skeleton.app.core.auth.jwt.JwtAuthFilter
+import skeleton.app.support.access.auth.basic.jwt.JwtAuthFilter
 
 
 @Configuration
@@ -31,11 +32,11 @@ class SecurityConfig(
                 .authorizeHttpRequests {
                     it
                             .requestMatchers(
-                                    AntPathRequestMatcher("/api/v1/auth/**"),
-                                    AntPathRequestMatcher("/api/v1/user"),
-                                    AntPathRequestMatcher("/api/v1/user/**"),
-                                    AntPathRequestMatcher("/api/v1/account"),
-                                    AntPathRequestMatcher("/api/v1/account/**"),
+                                    AntPathRequestMatcher("/${Endpoints.AUTH}/**"),
+                                    AntPathRequestMatcher("/${Endpoints.USER}"),
+                                    AntPathRequestMatcher("/${Endpoints.USER}/**"),
+                                    AntPathRequestMatcher("/${Endpoints.ACCOUNT}"),
+                                    AntPathRequestMatcher("/${Endpoints.ACCOUNT}/**"),
                                     AntPathRequestMatcher("/v3/api-docs"),
                                     AntPathRequestMatcher("/v3/api-docs/**"),
                                     AntPathRequestMatcher("/swagger-ui/**"),
@@ -47,8 +48,9 @@ class SecurityConfig(
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
                 .logout { logout ->
-                    logout.logoutUrl("${Endpoints.AUTH}/logout")
+                    logout
                             .addLogoutHandler(logoutHandler)
+                            .logoutRequestMatcher(AntPathRequestMatcher("/${Endpoints.AUTH}/logout", "POST"))
                             .logoutSuccessHandler(({ _, _, _ -> SecurityContextHolder.clearContext() }))
                             .invalidateHttpSession(true)
                 }

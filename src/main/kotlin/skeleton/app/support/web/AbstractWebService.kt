@@ -2,6 +2,7 @@ package skeleton.app.support.web
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import java.util.Optional
 
 abstract class AbstractWebService<T> {
     fun assertBadRequest(nullableEntity: T?): T {

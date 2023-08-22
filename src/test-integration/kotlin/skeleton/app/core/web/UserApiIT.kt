@@ -9,11 +9,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import skeleton.app.AbstractWebIT
 import skeleton.app.configuration.constants.ResourcePaths
-import skeleton.app.core.user.User
-import skeleton.app.core.user.UserRepository
-import skeleton.app.core.user.web.UserController
-import skeleton.app.core.user.web.UserDto
-import skeleton.app.core.user.web.UserWebService
+import skeleton.app.domain.user.User
+import skeleton.app.domain.user.UserRepository
+import skeleton.app.domain.user.web.UserController
+import skeleton.app.domain.user.web.UserDto
+import skeleton.app.domain.user.web.UserWebService
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import java.util.*
 
@@ -29,12 +29,8 @@ class UserApiIT : AbstractWebIT<User>() {
     @Autowired
     private lateinit var service: UserWebService
 
-
     override fun getRepository() = repository
     override fun getEntityType() = User::class.java
-    override fun preProcessing(data: User) {
-        //data.status = UserStatus.WAITING_PAYMENT
-    }
 
     override fun getResource() = RESOURCE
 
@@ -64,6 +60,4 @@ class UserApiIT : AbstractWebIT<User>() {
                 .andExpect(header().exists("Location"))
                 .andReturn()
     }
-
-
 }
