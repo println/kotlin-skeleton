@@ -3,13 +3,26 @@
 This project implements Spring Boot 3.0 and JSON Web Tokens (JWT). 
 It includes the following features:
 
-## Features
+## Technologies
 
 * Spring Boot 3.0
 * Spring Security
 * JSON Web Tokens (JWT)
 * BCrypt
 * Maven
+
+## Features
+
+* Basic Auth
+* Accounts
+* Password recovery
+* Session
+* Integration tests
+
+#### TODO
+1. Response API errors with application/problem+json
+1. Add migration system
+1. Update Dockerfile
 
 ## Prerequisites
 
