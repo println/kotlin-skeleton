@@ -3,7 +3,7 @@ package skeleton.app.support.access.auth.basic.jwt
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.SignatureAlgorithm.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.security.core.userdetails.UserDetails
@@ -28,7 +28,7 @@ class JwtService(
             .setSubject(userDetails.username)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + expirationTime.toLong()))
-            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .signWith(getSignInKey(), HS256)
             .compact()
 
     fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {

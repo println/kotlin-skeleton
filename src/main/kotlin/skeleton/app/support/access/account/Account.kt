@@ -5,12 +5,14 @@ import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import skeleton.app.configuration.constants.TableNames
-import skeleton.app.support.access.auth.basic.login.Login
+import skeleton.app.configuration.constants.TableNames.Core.ACCOUNT
+import skeleton.app.support.access.account.AccountRole.*
+import skeleton.app.support.access.account.AccountStatus.*
+import skeleton.app.support.access.login.Login
 import skeleton.app.support.jpa.AuditableModel
 
 @Entity
-@Table(name = TableNames.Core.ACCOUNT)
+@Table(name = ACCOUNT)
 data class Account(
         var firstName: String,
         var lastName: String,
@@ -22,7 +24,9 @@ data class Account(
                 fetch = FetchType.LAZY)
         val login: Login,
         @Enumerated(EnumType.STRING)
-        var role: AccountRole = AccountRole.USER
+        var role: AccountRole = USER,
+        @Enumerated(EnumType.STRING)
+        var status: AccountStatus = ENABLED
 ): AuditableModel<Account>(), UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(this.role.name))
@@ -37,18 +41,18 @@ data class Account(
     }
 
     override fun isAccountNonExpired(): Boolean {
-        return true
+        return status != EXPIRED
     }
 
     override fun isAccountNonLocked(): Boolean {
-        return true
+        return status != LOCKED
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        return true
+        return status != CREDENTIALS_EXPIRED
     }
 
     override fun isEnabled(): Boolean {
-        return true
+        return status == ENABLED
     }
 }

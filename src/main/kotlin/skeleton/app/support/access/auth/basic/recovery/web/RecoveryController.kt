@@ -1,15 +1,16 @@
 package skeleton.app.support.access.auth.basic.recovery.web
 
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.RECOVERY
+import skeleton.app.configuration.constants.Endpoints.RECOVERY_
 import java.util.*
 
 
 @RestController
-@RequestMapping(Endpoints.RECOVERY, Endpoints.RECOVERY_)
+@RequestMapping(RECOVERY, RECOVERY_)
 class RecoveryController(
         private val webService: RecoveryWebService
 ) {
@@ -18,7 +19,7 @@ class RecoveryController(
             @Valid @RequestBody data: RecoveryEmailDto
     ): ResponseEntity<Unit> {
         webService.forgot(data)
-        return ResponseEntity<Unit>(HttpStatus.CREATED)
+        return ResponseEntity<Unit>(CREATED)
     }
 
     @PostMapping("/change-password/{token}")
@@ -27,6 +28,6 @@ class RecoveryController(
             @Valid @RequestBody data: RecoveryPasswordDto
     ): ResponseEntity<Unit> {
         webService.changePassword(token, data)
-        return ResponseEntity<Unit>(HttpStatus.OK)
+        return ResponseEntity<Unit>(OK)
     }
 }

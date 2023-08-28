@@ -11,14 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.AUTH
+import skeleton.app.configuration.constants.Endpoints.AUTH_
 import skeleton.app.support.access.auth.basic.auth.AuthRegisterRequest
 import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthTokens
 
 
 @RestController
-@RequestMapping(Endpoints.AUTH, Endpoints.AUTH_)
+@RequestMapping(AUTH, AUTH_)
 class AuthController(
         private val authWebService: AuthWebService
 ) {

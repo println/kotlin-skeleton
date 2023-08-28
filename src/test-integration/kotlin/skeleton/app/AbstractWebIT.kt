@@ -1,15 +1,15 @@
 package skeleton.app
 
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 import org.jeasy.random.EasyRandom
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.http.MediaType.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.support.jpa.AuditableModel
 import java.util.*
 
@@ -43,33 +43,33 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
             "?page=10, false, 9, true"
     )
     fun getAll(page: String, first: Boolean, index: Int, last: Boolean) {
-        restMockMvc.perform(MockMvcRequestBuilders.get("${getResource()}$page")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.content", Matchers.hasSize<String>(20)))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.first").value(first))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.number").value(index))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.last").value(last))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.totalPages").value(10))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.numberOfElements").value(20))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.size").value(20))
+        restMockMvc.perform(get("${getResource()}$page")
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("\$.content", hasSize<String>(20)))
+                .andExpect(jsonPath("\$.first").value(first))
+                .andExpect(jsonPath("\$.number").value(index))
+                .andExpect(jsonPath("\$.last").value(last))
+                .andExpect(jsonPath("\$.totalPages").value(10))
+                .andExpect(jsonPath("\$.numberOfElements").value(20))
+                .andExpect(jsonPath("\$.size").value(20))
     }
 
     @Test
     fun getById() {
         val id = entities.first().id
-        restMockMvc.perform(MockMvcRequestBuilders.get("${getResource()}/{id}", id)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("\$").isNotEmpty)
+        restMockMvc.perform(get("${getResource()}/{id}", id)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("\$").isNotEmpty)
     }
 
     @Test
     fun getByWrongIdNotFound() {
         val id = UUID.randomUUID()
-        restMockMvc.perform(MockMvcRequestBuilders.get("${getResource()}/{id}", id)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
+        restMockMvc.perform(get("${getResource()}/{id}", id)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isNotFound)
     }
 }

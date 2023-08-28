@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.SESSION
+import skeleton.app.configuration.constants.Endpoints.SESSION_
 import skeleton.app.support.access.session.Session
 import skeleton.app.support.access.session.SessionFilter
 import java.util.*
 
-@RequestMapping(Endpoints.SESSION, Endpoints.SESSION_)
+@RequestMapping(SESSION, SESSION_)
 @RestController
 class SessionController(
         private val service: SessionWebService

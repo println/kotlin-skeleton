@@ -2,15 +2,16 @@ package skeleton.app.core.web
 
 import com.github.javafaker.Faker
 import org.jeasy.random.EasyRandom
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractWebIT
-import skeleton.app.configuration.constants.ResourcePaths
+import skeleton.app.configuration.constants.Endpoints.ACCOUNT
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
@@ -18,7 +19,7 @@ import skeleton.app.support.access.account.web.AccountController
 import skeleton.app.support.access.account.web.AccountWebService
 import skeleton.app.support.access.account.web.UpdateInfoDto
 import skeleton.app.support.access.account.web.UpdateLoginDto
-import skeleton.app.support.access.auth.basic.login.Login
+import skeleton.app.support.access.login.Login
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 
 class AccountIT : AbstractWebIT<Account>() {
@@ -38,7 +39,7 @@ class AccountIT : AbstractWebIT<Account>() {
         return generateAccount()
     }
 
-    override fun getResource() = RESOURCE
+    override fun getResource() = ACCOUNT
     override fun createResource(): Any = AccountController(webService)
 
     @Test
@@ -47,11 +48,11 @@ class AccountIT : AbstractWebIT<Account>() {
 
         restMockMvc
                 .perform(MockMvcRequestBuilders.post(RESOURCE)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(data.toJsonString()))
-                .andExpect(MockMvcResultMatchers.status().isCreated)
-                .andExpect(MockMvcResultMatchers.header().exists("Location"))
+                .andExpect(status().isCreated)
+                .andExpect(header().exists("Location"))
                 .andReturn()
     }
 
@@ -62,20 +63,20 @@ class AccountIT : AbstractWebIT<Account>() {
         val data = UpdateInfoDto(account.firstName, account.lastName)
 
         restMockMvc
-                .perform(MockMvcRequestBuilders.put("$RESOURCE/{id}", entity.id)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
+                .perform(put("$RESOURCE/{id}", entity.id)
+                        .accept(APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(data.toJsonString()))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.firstName").value(account.firstName))
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.lastName").value(account.lastName))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("\$.firstName").value(account.firstName))
+                .andExpect(jsonPath("\$.lastName").value(account.lastName))
 
         val updatedEntity = repository.findById(entity.id!!).get()
-        Assertions.assertNotEquals(entity.firstName, updatedEntity.firstName)
-        Assertions.assertNotEquals(entity.lastName, updatedEntity.lastName)
+        assertNotEquals(entity.firstName, updatedEntity.firstName)
+        assertNotEquals(entity.lastName, updatedEntity.lastName)
 
-        Assertions.assertEquals(data.firstName, updatedEntity.firstName)
-        Assertions.assertEquals(data.lastName, updatedEntity.lastName)
+        assertEquals(data.firstName, updatedEntity.firstName)
+        assertEquals(data.lastName, updatedEntity.lastName)
     }
 
     @Test
@@ -85,21 +86,21 @@ class AccountIT : AbstractWebIT<Account>() {
         val data = UpdateLoginDto(account.email, account.login.password)
 
         restMockMvc
-                .perform(MockMvcRequestBuilders.put("$RESOURCE/{id}/login", entity.id)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
+                .perform(put("$RESOURCE/{id}/login", entity.id)
+                        .accept(APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(data.toJsonString()))
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("\$.email").value(account.email))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("\$.email").value(account.email))
 
         val updatedEntity = service.authenticate(account.login.username, account.login.password)
-        Assertions.assertNotEquals(entity.email, updatedEntity.email)
-        Assertions.assertNotEquals(entity.login.username, updatedEntity.login.username)
-        Assertions.assertNotEquals(entity.login.password, updatedEntity.login.password)
+        assertNotEquals(entity.email, updatedEntity.email)
+        assertNotEquals(entity.login.username, updatedEntity.login.username)
+        assertNotEquals(entity.login.password, updatedEntity.login.password)
 
-        Assertions.assertEquals(data.email, updatedEntity.email)
-        Assertions.assertEquals(data.email, updatedEntity.login.username)
-        Assertions.assertNotEquals(data.password, updatedEntity.login.password)
+        assertEquals(data.email, updatedEntity.email)
+        assertEquals(data.email, updatedEntity.login.username)
+        assertNotEquals(data.password, updatedEntity.login.password)
     }
 
     companion object {
@@ -107,7 +108,7 @@ class AccountIT : AbstractWebIT<Account>() {
         private val faker = Faker()
         private val easyRandom = EasyRandom()
 
-        const val RESOURCE = ResourcePaths.ACCOUNT
+        const val RESOURCE = ACCOUNT
         fun createAccount(account: Account = generateAccount(), repository: AccountRepository, encoder: PasswordEncoder): Account {
             val data = Account(
                     account.firstName, account.lastName, account.email,

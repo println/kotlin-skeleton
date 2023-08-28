@@ -2,7 +2,8 @@ package skeleton.app.support.access.auth.basic.auth.web
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import skeleton.app.support.access.auth.basic.auth.AuthRegisterRequest
@@ -29,9 +30,9 @@ class AuthWebService(
 
     fun refreshToken(request: HttpServletRequest,
                      response: HttpServletResponse): AuthTokens {
-        val authHeader = request.getHeader(org.springframework.http.HttpHeaders.AUTHORIZATION);
+        val authHeader = request.getHeader(AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong Request")
+            throw ResponseStatusException(BAD_REQUEST, "Wrong Request")
         }
         val refreshToken = authHeader.substring(7)
         return authService.refreshToken(refreshToken)

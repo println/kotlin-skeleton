@@ -5,13 +5,14 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.USER
+import skeleton.app.configuration.constants.Endpoints.USER_
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserFilter
 import java.net.URI
 import java.util.*
 
-@RequestMapping(Endpoints.USER, Endpoints.USER_)
+@RequestMapping(USER, USER_)
 @RestController
 class UserController(val service: UserWebService) {
     @GetMapping("test")

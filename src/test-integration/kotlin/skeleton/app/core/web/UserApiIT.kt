@@ -3,12 +3,11 @@ package skeleton.app.core.web
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.http.MediaType.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractWebIT
-import skeleton.app.configuration.constants.ResourcePaths
+import skeleton.app.configuration.constants.Endpoints.USER
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserRepository
 import skeleton.app.domain.user.web.UserController
@@ -20,7 +19,7 @@ import java.util.*
 class UserApiIT : AbstractWebIT<User>() {
 
     companion object {
-        const val RESOURCE = ResourcePaths.USER
+        const val RESOURCE = USER
     }
 
     @Autowired
@@ -53,8 +52,8 @@ class UserApiIT : AbstractWebIT<User>() {
 
         restMockMvc
                 .perform(post(RESOURCE)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(data.toJsonString()))
                 .andExpect(status().isCreated)
                 .andExpect(header().exists("Location"))

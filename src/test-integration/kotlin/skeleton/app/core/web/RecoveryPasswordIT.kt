@@ -1,14 +1,18 @@
 package skeleton.app.core.web
 
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractIT
-import skeleton.app.configuration.constants.ResourcePaths
+import skeleton.app.configuration.constants.Endpoints.RECOVERY
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
@@ -26,7 +30,7 @@ import java.util.*
 class RecoveryPasswordIT : AbstractIT() {
 
     companion object {
-        const val RESOURCE = ResourcePaths.RECOVERY
+        const val RESOURCE = RECOVERY
     }
 
     @Autowired
@@ -62,14 +66,14 @@ class RecoveryPasswordIT : AbstractIT() {
     fun forgotPassword() {
         val data = RecoveryEmailDto(account.email)
 
-        restMockMvc.perform(MockMvcRequestBuilders.post("${RESOURCE}/forgot")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
+        restMockMvc.perform(post("${RESOURCE}/forgot")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(data.toJsonString()))
-                .andExpect(MockMvcResultMatchers.status().isCreated)
+                .andExpect(status().isCreated)
 
-        Assertions.assertTrue(repository.count() > 0)
-        Assertions.assertTrue(repository.existsByAccountId(account.id!!))
+        assertTrue(repository.count() > 0)
+        assertTrue(repository.existsByAccountId(account.id!!))
     }
 
     @Test
@@ -78,11 +82,11 @@ class RecoveryPasswordIT : AbstractIT() {
         val newPassword = "newpassword"
         val data = RecoveryPasswordDto(newPassword, entity.securityCode)
 
-        restMockMvc.perform(MockMvcRequestBuilders.post("${RESOURCE}/change-password/{token}", entity.id)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
+        restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(data.toJsonString()))
-                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(status().isOk)
 
         accountService.authenticate(account.login.username, newPassword)
     }
@@ -94,14 +98,14 @@ class RecoveryPasswordIT : AbstractIT() {
         fun forgotPassword_wrongEmail() {
             val data = RecoveryEmailDto("xpto@xpto.com")
 
-            restMockMvc.perform(MockMvcRequestBuilders.post("${RESOURCE}/forgot")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
+            restMockMvc.perform(post("${RESOURCE}/forgot")
+                    .accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
-                    .andExpect(MockMvcResultMatchers.status().isCreated)
+                    .andExpect(status().isCreated)
 
-            Assertions.assertFalse(repository.count() > 0)
-            Assertions.assertFalse(repository.existsByAccountId(account.id!!))
+            assertFalse(repository.count() > 0)
+            assertFalse(repository.existsByAccountId(account.id!!))
         }
 
         @Test
@@ -112,11 +116,11 @@ class RecoveryPasswordIT : AbstractIT() {
             val newPassword = "newpassword"
             val data = RecoveryPasswordDto(newPassword, entity.securityCode)
 
-            restMockMvc.perform(MockMvcRequestBuilders.post("${RESOURCE}/change-password/{token}", entity.id)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
+            restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+                    .accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
-                    .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                    .andExpect(status().isBadRequest)
 
             assertThrows<BadCredentialsException> {
                 accountService.authenticate(account.login.username, newPassword)
@@ -130,11 +134,11 @@ class RecoveryPasswordIT : AbstractIT() {
             val newPassword = "newpassword"
             val data = RecoveryPasswordDto(newPassword, "5678")
 
-            restMockMvc.perform(MockMvcRequestBuilders.post("${RESOURCE}/change-password/{token}", entity.id)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
+            restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+                    .accept(APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
-                    .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                    .andExpect(status().isBadRequest)
 
             assertThrows<BadCredentialsException> {
                 accountService.authenticate(account.login.username, newPassword)

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.AUTH
 import skeleton.app.support.access.session.SessionService
 
 @Component
@@ -23,7 +23,7 @@ class JwtAuthFilter(
             response: HttpServletResponse,
             filterChain: FilterChain
     ) {
-        if (request.servletPath.contains(Endpoints.AUTH)) {
+        if (request.servletPath.contains(AUTH)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -42,7 +42,7 @@ class JwtAuthFilter(
             val userDetails = userDetailsService.loadUserByUsername(userEmail)
 
             val isTokenValid = sessionService.findByToken(jwt)
-                    .map { it -> it!!.expired && !it.revoked }
+                    .map { it!!.expired && !it.revoked }
                     ?.orElse(false)
 
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid!!) {

@@ -14,7 +14,7 @@ import skeleton.app.domain.user.UserFilter
 import skeleton.app.support.access.account.web.AccountRegisterDto
 import skeleton.app.support.access.account.web.UpdateInfoDto
 import skeleton.app.support.access.account.web.UpdateLoginDto
-import skeleton.app.support.access.auth.basic.login.Login
+import skeleton.app.support.access.login.Login
 import java.util.*
 
 @Service

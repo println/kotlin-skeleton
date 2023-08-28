@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountService
+import skeleton.app.support.access.auth.basic.recovery.RecoveryTokenStatus.*
 import skeleton.app.support.access.auth.basic.recovery.email.RecoveryNotifier
 import java.util.*
 
@@ -41,7 +42,7 @@ class RecoveryService(
         val entityToken = entityTokenOptional.get()
         val updatedEntityAccount = accountService.changePassword(entityToken.accountId, password)
 
-        entityToken.status = RecoveryTokenStatus.CLOSED
+        entityToken.status = CLOSED
         repository.save(entityToken)
 
         notifier.notifyPasswordChanged(updatedEntityAccount)

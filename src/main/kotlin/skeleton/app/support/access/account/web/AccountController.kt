@@ -6,13 +6,14 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import skeleton.app.configuration.constants.Endpoints
+import skeleton.app.configuration.constants.Endpoints.ACCOUNT
+import skeleton.app.configuration.constants.Endpoints.ACCOUNT_
 import skeleton.app.domain.user.UserFilter
 import java.net.URI
 import java.util.*
 
 
-@RequestMapping(Endpoints.ACCOUNT, Endpoints.ACCOUNT_)
+@RequestMapping(ACCOUNT, ACCOUNT_)
 @RestController
 class AccountController(
         private val service: AccountWebService

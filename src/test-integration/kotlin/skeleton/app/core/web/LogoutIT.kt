@@ -1,20 +1,22 @@
 package skeleton.app.core.web
 
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import skeleton.app.IntegrationTest
+import skeleton.app.core.web.AccountIT.Companion.createAccount
+import skeleton.app.core.web.AuthApiIT.Companion.RESOURCE
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthTokens
@@ -52,22 +54,22 @@ class LogoutIT : IntegrationTest() {
     @Test
     fun logout() {
         val account = AccountIT.generateAccount()
-        val entityAccount = AccountIT.createAccount(account, accountRepository, passwordEncoder)
+        val entityAccount = createAccount(account, accountRepository, passwordEncoder)
         val credentials = AuthRequest(account.login.username, account.login.password)
 
-        val tokens: AuthTokens = mockMvc.perform(MockMvcRequestBuilders.post("${AuthApiIT.RESOURCE}/authenticate")
-                .contentType(MediaType.APPLICATION_JSON)
+        val tokens: AuthTokens = mockMvc.perform(post("$RESOURCE/authenticate")
+                .contentType(APPLICATION_JSON)
                 .content(credentials.toJsonString()))
                 .andReturn().response.contentAsString.toObject()
 
-        Assertions.assertTrue(sessionRepository.existsByAccountIdAndExpiredIsFalseAndRevokedIsFalse(entityAccount.id))
+        assertTrue(sessionRepository.existsByAccountIdAndExpiredIsFalseAndRevokedIsFalse(entityAccount.id))
 
-        mockMvc.perform(MockMvcRequestBuilders.post("${AuthApiIT.RESOURCE}/logout")
+        mockMvc.perform(post("$RESOURCE/logout")
                 .secure(true)
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(csrf())
                 .header("Authorization", "Bearer ${tokens.accessToken}"))
-                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(status().isOk)
 
-        Assertions.assertFalse(sessionRepository.existsByAccountIdAndExpiredIsFalseAndRevokedIsFalse(entityAccount.id))
+        assertFalse(sessionRepository.existsByAccountIdAndExpiredIsFalseAndRevokedIsFalse(entityAccount.id))
     }
 }
