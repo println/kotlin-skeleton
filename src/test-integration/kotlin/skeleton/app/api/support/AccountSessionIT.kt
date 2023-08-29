@@ -1,4 +1,4 @@
-package skeleton.app.core.web
+package skeleton.app.api.support
 
 import org.springframework.beans.factory.annotation.Autowired
 import skeleton.app.AbstractWebIT
@@ -8,7 +8,7 @@ import skeleton.app.support.access.session.SessionRepository
 import skeleton.app.support.access.session.web.SessionController
 import skeleton.app.support.access.session.web.SessionWebService
 
-class SessionIT: AbstractWebIT<Session>() {
+class AccountSessionIT: AbstractWebIT<Session>() {
     companion object {
         const val RESOURCE = SESSION
     }

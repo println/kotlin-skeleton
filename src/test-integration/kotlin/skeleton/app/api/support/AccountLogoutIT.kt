@@ -1,4 +1,4 @@
-package skeleton.app.core.web
+package skeleton.app.api.support
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import skeleton.app.IntegrationTest
-import skeleton.app.core.web.AccountIT.Companion.createAccount
-import skeleton.app.core.web.AuthApiIT.Companion.RESOURCE
+import skeleton.app.api.support.AccountAuthIT.Companion.RESOURCE
+import skeleton.app.api.support.AccountIT.Companion.createAccount
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthTokens
@@ -25,7 +25,7 @@ import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import skeleton.app.support.extensions.ClassExtensions.toObject
 
 
-class LogoutIT : IntegrationTest() {
+class AccountLogoutIT : IntegrationTest() {
 
     @Autowired
     private lateinit var accountRepository: AccountRepository

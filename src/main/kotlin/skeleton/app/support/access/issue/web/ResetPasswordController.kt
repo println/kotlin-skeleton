@@ -15,19 +15,19 @@ class ResetPasswordController(
         private val webService: IssueWebService
 ) {
 
-    @PostMapping("/{accountId}")
+    @PostMapping
     @PreAuthorize("hasAuthority('admin:create')")
     fun assignTempPassword(
-            @PathVariable("accountId") id: UUID): ResetPasswordTemporaryDto {
-        return webService.resetPassword(id)
+            @Valid @RequestBody data: ResetPasswordAccountDto): ResponseEntity<ResetPasswordTemporaryDto> {
+        val entity = webService.resetPassword(data.accountId)
+        return ResponseEntity(entity, CREATED)
     }
 
-    @PostMapping("/renew/{token}")
+    @PostMapping("/renew")
     fun resolveTempPassword(
-            @PathVariable("token") token: UUID,
             @Valid @RequestBody data: ResetPasswordDto
     ): ResponseEntity<Unit> {
-        webService.resolveResetPassword(token, data)
+        webService.resolveResetPassword(data)
         return ResponseEntity(OK)
     }
 }

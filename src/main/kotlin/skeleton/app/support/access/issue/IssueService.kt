@@ -87,7 +87,14 @@ class IssueService(
 
     @Transactional
     fun createPendencyOfTemporaryPassword(accountId: UUID): String {
-        val entityAccount = accountService.findById(accountId)
+        lateinit var entityAccount: Account
+
+        try {
+            entityAccount = accountService.findById(accountId)
+        }catch (e:Exception){
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Id not found")
+        }
+
         val tempPassword = accountService.assignNewTemporaryPassword(accountId)
         accountService.incrementIssues(entityAccount.id!!)
 

@@ -13,10 +13,9 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import skeleton.app.configuration.constants.Endpoints.ACCOUNT
+import skeleton.app.configuration.constants.Endpoints.ACCOUNT_ACTIVATION
 import skeleton.app.configuration.constants.Endpoints.AUTH
 import skeleton.app.configuration.constants.Endpoints.MANAGEMENT
-import skeleton.app.configuration.constants.Endpoints.USER
 import skeleton.app.support.access.account.AccountRole.*
 import skeleton.app.support.access.account.Permission.*
 import skeleton.app.support.access.auth.basic.jwt.JwtAuthFilter
@@ -38,10 +37,7 @@ class SecurityConfig(
                     it
                             .requestMatchers(
                                     AntPathRequestMatcher("$AUTH/**"),
-                                    AntPathRequestMatcher(USER),
-                                    AntPathRequestMatcher("$USER/**"),
-                                    AntPathRequestMatcher(ACCOUNT),
-                                    AntPathRequestMatcher("$ACCOUNT/**"),
+                                    AntPathRequestMatcher(ACCOUNT_ACTIVATION),
                                     AntPathRequestMatcher("/v3/api-docs"),
                                     AntPathRequestMatcher("/v3/api-docs/**"),
                                     AntPathRequestMatcher("/swagger-ui/**"),

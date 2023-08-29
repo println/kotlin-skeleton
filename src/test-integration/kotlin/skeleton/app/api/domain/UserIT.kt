@@ -1,22 +1,15 @@
-package skeleton.app.core.web
+package skeleton.app.api.domain
 
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType.*
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractWebIT
 import skeleton.app.configuration.constants.Endpoints.USER
 import skeleton.app.domain.user.User
 import skeleton.app.domain.user.UserRepository
 import skeleton.app.domain.user.web.UserController
-import skeleton.app.domain.user.web.UserDto
 import skeleton.app.domain.user.web.UserWebService
-import skeleton.app.support.extensions.ClassExtensions.toJsonString
-import java.util.*
 
-class UserApiIT : AbstractWebIT<User>() {
+class UserIT : AbstractWebIT<User>() {
 
     companion object {
         const val RESOURCE = USER

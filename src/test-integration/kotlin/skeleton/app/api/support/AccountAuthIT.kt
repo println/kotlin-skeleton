@@ -1,4 +1,4 @@
-package skeleton.app.core.web
+package skeleton.app.api.support
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -9,9 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractIT
+import skeleton.app.api.support.AccountIT.Companion.generateAccount
+import skeleton.app.api.support.AccountIT.Companion.generateAccountRegister
 import skeleton.app.configuration.constants.Endpoints
-import skeleton.app.core.web.AccountIT.Companion.generateAccount
-import skeleton.app.core.web.AccountIT.Companion.generateAccountRegister
 import skeleton.app.domain.user.UserRepository
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
@@ -21,13 +21,14 @@ import skeleton.app.support.access.auth.basic.auth.web.AuthController
 import skeleton.app.support.access.auth.basic.auth.web.AuthWebService
 import skeleton.app.support.access.issue.IssueRepository
 import skeleton.app.support.access.issue.IssueService
+import skeleton.app.support.access.issue.IssueStatus.*
 import skeleton.app.support.access.session.Session
 import skeleton.app.support.access.session.SessionRepository
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import skeleton.app.support.extensions.ClassExtensions.toObject
 
 
-class AuthApiIT : AbstractIT() {
+class AccountAuthIT : AbstractIT() {
 
 
     @Autowired
@@ -68,12 +69,12 @@ class AuthApiIT : AbstractIT() {
 
     @Test
     fun register() {
-        val account = generateAccountRegister()
+        val data = generateAccountRegister()
 
         restMockMvc.perform(post("$RESOURCE/register")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(account.toJsonString()))
+                .content(data.toJsonString()))
                 .andExpect(status().isCreated)
                 .andReturn()
 
@@ -82,7 +83,9 @@ class AuthApiIT : AbstractIT() {
         assertTrue(userRepository.findAll().isNotEmpty())
         assertTrue(sessionRepository.findAll().isEmpty())
 
-        accountService.authenticate(account.email, account.password)
+        val account = accountService.authenticate(data.email, data.password)
+
+        assertNotNull(issueRepository.findFirstByAccountIdAndStatus(account.id!!, OPEN).get())
     }
 
     @Test

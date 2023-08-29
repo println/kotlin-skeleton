@@ -1,4 +1,4 @@
-package skeleton.app.core.web
+package skeleton.app.api.support
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -17,6 +17,7 @@ import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.issue.IssueRepository
+import skeleton.app.support.access.issue.IssueStatus.*
 import skeleton.app.support.access.issue.IssueToken
 import skeleton.app.support.access.issue.IssueType
 import skeleton.app.support.access.issue.web.ForgotPasswordController
@@ -26,7 +27,7 @@ import skeleton.app.support.access.issue.web.IssueWebService
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import java.time.LocalDateTime
 
-class RecoveryPasswordIT : AbstractIT() {
+class AccountPasswordForgotIT : AbstractIT() {
 
     companion object {
         const val RESOURCE = FORGOT_PASSWORD
@@ -71,23 +72,29 @@ class RecoveryPasswordIT : AbstractIT() {
                 .content(data.toJsonString()))
                 .andExpect(status().isCreated)
 
+        account = accountRepository.findById(account.id!!).get()
+
         assertTrue(repository.count() > 0)
-        assertTrue(repository.existsByAccountId(account.id!!))
+        assertNotNull(repository.findFirstByAccountIdAndStatus(account.id!!, OPEN).get())
+        assertTrue(account.issues == 1)
     }
 
     @Test
     fun changePassword() {
-        val entity = repository.save(IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD))
+        val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD)
+        val entityToken = repository.save(token)
         val newPassword = "newpassword"
-        val data = ForgotPasswordDto(newPassword, entity.securityCode)
+        val data = ForgotPasswordDto(entityToken.id!!, newPassword, entityToken.securityCode)
 
-        restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
+        restMockMvc.perform(post("$RESOURCE/renew")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(data.toJsonString()))
                 .andExpect(status().isOk)
 
-        accountService.authenticate(account.login.username, newPassword)
+        account = accountService.authenticate(account.login.username, newPassword)
+        assertNotNull(repository.findFirstByAccountIdAndStatus(account.id!!, CLOSED).get())
+        assertTrue(account.issues == 0)
     }
 
     @Nested
@@ -111,11 +118,11 @@ class RecoveryPasswordIT : AbstractIT() {
         fun changePassword_tokenExpired() {
             val recoveryExpiration =LocalDateTime.now().minusHours(3)
             val token = IssueToken(account.id!!, "1234", recoveryExpiration, IssueType.FORGOT_PASSWORD)
-            val entity = repository.save(token)
+            val entityToken = repository.save(token)
             val newPassword = "newpassword"
-            val data = ForgotPasswordDto(newPassword, entity.securityCode)
+            val data = ForgotPasswordDto(entityToken.id!!, newPassword, entityToken.securityCode)
 
-            restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
+            restMockMvc.perform(post("$RESOURCE/renew")
                     .accept(APPLICATION_JSON)
                     .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
@@ -129,11 +136,11 @@ class RecoveryPasswordIT : AbstractIT() {
         @Test
         fun changePassword_wrongSecurityCode() {
             val token = IssueToken(account.id!!, "1234", type = IssueType.FORGOT_PASSWORD)
-            val entity = repository.save(token)
+            val entityToken = repository.save(token)
             val newPassword = "newpassword"
-            val data = ForgotPasswordDto(newPassword, "5678")
+            val data = ForgotPasswordDto(entityToken.id!!, newPassword, "2678")
 
-            restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
+            restMockMvc.perform(post("$RESOURCE/renew")
                     .accept(APPLICATION_JSON)
                     .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))

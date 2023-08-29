@@ -29,8 +29,8 @@ class IssueWebService(
         service.createPendencyOfForgotPassword(data.email)
     }
 
-    fun resolveForgotPassword(tokenId: UUID, data: ForgotPasswordDto): AccountDto {
-        val nullableEntity = service.resolvePasswordChange(tokenId, data.securityCode, data.password)
+    fun resolveForgotPassword(data: ForgotPasswordDto): AccountDto {
+        val nullableEntity = service.resolvePasswordChange(data.tokenId, data.securityCode, data.password)
         val entity: Account = assertNotFound(nullableEntity)
         return AccountDto(entity)
     }
@@ -39,8 +39,8 @@ class IssueWebService(
         return ResetPasswordTemporaryDto(service.createPendencyOfTemporaryPassword(id))
     }
 
-    fun resolveResetPassword(token: UUID, password: ResetPasswordDto): AccountDto {
-        val nullableEntity = service.resolveTemporaryPassword(token, password.password)
+    fun resolveResetPassword(data: ResetPasswordDto): AccountDto {
+        val nullableEntity = service.resolveTemporaryPassword(data.tokenId, data.password)
         val entity: Account = assertNotFound(nullableEntity)
         return AccountDto(entity)
     }
