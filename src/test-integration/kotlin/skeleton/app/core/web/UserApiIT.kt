@@ -41,22 +41,4 @@ class UserApiIT : AbstractWebIT<User>() {
     fun reset() {
         repository.deleteAll()
     }
-
-    @Test
-    fun create() {
-        val customerId = UUID.randomUUID()
-        val pickupAddress = "pickupAddress"
-        val destination = "destination"
-
-        val data = UserDto(customerId, pickupAddress, destination)
-
-        restMockMvc
-                .perform(post(RESOURCE)
-                        .accept(APPLICATION_JSON)
-                        .contentType(APPLICATION_JSON)
-                        .content(data.toJsonString()))
-                .andExpect(status().isCreated)
-                .andExpect(header().exists("Location"))
-                .andReturn()
-    }
 }

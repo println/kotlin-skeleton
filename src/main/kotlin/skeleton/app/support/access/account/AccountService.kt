@@ -9,19 +9,22 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import skeleton.app.domain.user.UserFilter
+import skeleton.app.support.access.AccountUserService
 import skeleton.app.support.access.account.web.AccountRegisterDto
-import skeleton.app.support.access.account.web.UpdateInfoDto
 import skeleton.app.support.access.account.web.UpdateLoginDto
 import skeleton.app.support.access.login.Login
+import skeleton.app.support.functions.Generators
 import java.util.*
 
 @Service
 class AccountService(
         private val repository: AccountRepository,
         private val passwordEncoder: PasswordEncoder,
-        private val authenticationManager: AuthenticationManager
+        private val authenticationManager: AuthenticationManager,
+        private val accountUserService: AccountUserService
 ) {
 
     fun findAll(userFilter: UserFilter, pageable: Pageable): Page<Account> {
@@ -37,6 +40,11 @@ class AccountService(
         return entityOptional.get()
     }
 
+    fun findByEmail(email: String): Optional<Account?> {
+        return repository.findByEmail(email)
+    }
+
+    @Transactional
     fun register(@Valid register: AccountRegisterDto): Account? {
         AccountPolicies.assertName(register.firstName)
         AccountPolicies.assertName(register.lastName)
@@ -48,26 +56,17 @@ class AccountService(
         }
 
         val account = Account(
-                register.firstName,
-                register.lastName,
                 register.email,
-                Login(
-                        register.email,
-                        "")
+                Login(register.email, "")
         )
         setPassword(account, register.password)
-        return repository.save(account)
+        val entityAccount = repository.save(account)
+
+        accountUserService.create(entityAccount, register.firstName, register.lastName)
+
+        return entityAccount
     }
 
-    fun update(id: UUID, @Valid updateInfo: UpdateInfoDto): Account {
-        AccountPolicies.assertName(updateInfo.firstName)
-        AccountPolicies.assertName(updateInfo.lastName)
-
-        val entity = findById(id)
-        entity.firstName = updateInfo.firstName
-        entity.lastName = updateInfo.lastName
-        return repository.save(entity)
-    }
 
     fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): Account {
         AccountPolicies.assertEmail(updateLogin.email)
@@ -80,6 +79,54 @@ class AccountService(
         return repository.save(entity)
     }
 
+    @Transactional
+    fun updateRole(id: UUID, role: AccountRole): Account {
+        val entity = findById(id)
+        entity.role = role
+        return repository.save(entity)
+    }
+
+    @Transactional
+    fun incrementIssues(id: UUID): Account {
+        val entity = findById(id)
+        entity.issues += 1
+        return repository.save(entity)
+    }
+
+    @Transactional
+    fun decrementIssues(id: UUID): Account {
+        val entity = findById(id)
+        entity.issues = if (entity.issues <= 0) 0 else entity.issues - 1
+        return repository.save(entity)
+    }
+
+    @Transactional
+    fun block(id: UUID): Account {
+        return updateStatus(id, AccountStatus.BLOCKED)
+    }
+
+    @Transactional
+    fun unblock(id: UUID): Account {
+        return updateStatus(id, AccountStatus.ACTIVE)
+    }
+
+    @Transactional
+    fun changePassword(id: UUID, password: String): Account {
+        val entity = findById(id)
+        setPassword(entity, password)
+        return repository.save(entity)
+    }
+
+    @Transactional
+    fun assignNewTemporaryPassword(id: UUID): String {
+        val entity = findById(id)
+        val tempPassword = Generators.generatePassword()
+        setPassword(entity, tempPassword)
+        repository.save(entity)
+        return tempPassword
+    }
+
+    @Transactional
     fun authenticate(email: String, password: String): Account {
         authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(email, password)
@@ -87,18 +134,15 @@ class AccountService(
         return repository.findByEmail(email).get()
     }
 
-    fun findByEmail(email: String): Optional<Account?> {
-        return repository.findByEmail(email)
-    }
-
-    fun changePassword(id: UUID, password: String): Account {
-        val entity = findById(id)
-        setPassword(entity, password)
-        return repository.save(entity)
-    }
 
     private fun setPassword(account: Account, password: String) {
         AccountPolicies.assertPassword(password)
         account.login.password = passwordEncoder.encode(password)
+    }
+
+    private fun updateStatus(id: UUID, status: AccountStatus): Account {
+        val entity = findById(id)
+        entity.status = status
+        return repository.save(entity)
     }
 }

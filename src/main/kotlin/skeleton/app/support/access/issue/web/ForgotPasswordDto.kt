@@ -1,9 +1,9 @@
-package skeleton.app.support.access.auth.basic.recovery.web
+package skeleton.app.support.access.issue.web
 
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
-data class RecoveryPasswordDto(
+data class ForgotPasswordDto(
         @field: Size(min=6, max = 128)
         val password: String,
         @field: Size(min=4, max = 4)

@@ -14,9 +14,7 @@ import skeleton.app.support.jpa.AuditableModel
 @Entity
 @Table(name = ACCOUNT)
 data class Account(
-        var firstName: String,
-        var lastName: String,
-        @Column(unique=true, nullable = false)
+        @Column(unique = true, nullable = false)
         var email: String,
         @OneToOne(
                 cascade = [CascadeType.ALL],
@@ -26,8 +24,9 @@ data class Account(
         @Enumerated(EnumType.STRING)
         var role: AccountRole = USER,
         @Enumerated(EnumType.STRING)
-        var status: AccountStatus = ENABLED
-): AuditableModel<Account>(), UserDetails {
+        var status: AccountStatus = ACTIVE,
+        var issues: Int = 0
+) : AuditableModel<Account>(), UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(this.role.name))
     }
@@ -41,18 +40,18 @@ data class Account(
     }
 
     override fun isAccountNonExpired(): Boolean {
-        return status != EXPIRED
+        return status != BLOCKED
     }
 
     override fun isAccountNonLocked(): Boolean {
-        return status != LOCKED
+        return status != BLOCKED
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        return status != CREDENTIALS_EXPIRED
+        return status != BLOCKED
     }
 
     override fun isEnabled(): Boolean {
-        return status == ENABLED
+        return status == ACTIVE
     }
 }

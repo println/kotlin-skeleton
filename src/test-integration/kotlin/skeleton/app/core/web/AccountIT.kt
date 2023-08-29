@@ -16,8 +16,8 @@ import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.account.web.AccountController
+import skeleton.app.support.access.account.web.AccountRegisterDto
 import skeleton.app.support.access.account.web.AccountWebService
-import skeleton.app.support.access.account.web.UpdateInfoDto
 import skeleton.app.support.access.account.web.UpdateLoginDto
 import skeleton.app.support.access.login.Login
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
@@ -44,7 +44,7 @@ class AccountIT : AbstractWebIT<Account>() {
 
     @Test
     fun create() {
-        val data = generateAccount()
+        val data = generateAccountRegister()
 
         restMockMvc
                 .perform(MockMvcRequestBuilders.post(RESOURCE)
@@ -54,29 +54,6 @@ class AccountIT : AbstractWebIT<Account>() {
                 .andExpect(status().isCreated)
                 .andExpect(header().exists("Location"))
                 .andReturn()
-    }
-
-    @Test
-    fun updateInfo() {
-        val entity = entities.first() as Account
-        val account = generateAccount()
-        val data = UpdateInfoDto(account.firstName, account.lastName)
-
-        restMockMvc
-                .perform(put("$RESOURCE/{id}", entity.id)
-                        .accept(APPLICATION_JSON)
-                        .contentType(APPLICATION_JSON)
-                        .content(data.toJsonString()))
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("\$.firstName").value(account.firstName))
-                .andExpect(jsonPath("\$.lastName").value(account.lastName))
-
-        val updatedEntity = repository.findById(entity.id!!).get()
-        assertNotEquals(entity.firstName, updatedEntity.firstName)
-        assertNotEquals(entity.lastName, updatedEntity.lastName)
-
-        assertEquals(data.firstName, updatedEntity.firstName)
-        assertEquals(data.lastName, updatedEntity.lastName)
     }
 
     @Test
@@ -111,20 +88,25 @@ class AccountIT : AbstractWebIT<Account>() {
         const val RESOURCE = ACCOUNT
         fun createAccount(account: Account = generateAccount(), repository: AccountRepository, encoder: PasswordEncoder): Account {
             val data = Account(
-                    account.firstName, account.lastName, account.email,
+                    account.email,
                     Login(account.login.username,
                             encoder.encode(account.login.password)))
             return repository.save(data)
         }
 
         fun generateAccount(): Account {
-            val firstName = faker.name().firstName()
-            val lastName = faker.name().lastName()
             val login = Login(
                     easyRandom.nextObject(String::class.java) + "." + faker.internet().emailAddress(),
                     faker.internet().password(6, 128)
             )
-            return Account(firstName, lastName, login.username, login)
+            return Account(login.username, login)
+        }
+
+        fun generateAccountRegister(): AccountRegisterDto {
+            val account = generateAccount()
+            val firstName = faker.name().firstName()
+            val lastName = faker.name().lastName()
+            return AccountRegisterDto(firstName, lastName, account.email, account.password)
         }
     }
 

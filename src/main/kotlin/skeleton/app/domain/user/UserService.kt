@@ -3,14 +3,18 @@ package skeleton.app.domain.user
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
+import skeleton.app.support.access.AccountUserService
+import skeleton.app.support.access.account.Account
 import java.math.BigDecimal
 import java.util.*
 
 @Service
 class UserService(
-        private val repository: UserRepository) {
+        private val repository: UserRepository): AccountUserService {
 
     fun findAll(userFilter: UserFilter, pageable: Pageable): Page<User> {
         val specification: Specification<User> = Specification.where(null)
@@ -18,16 +22,28 @@ class UserService(
     }
 
     fun findById(id: UUID): User? {
-       return repository.findById(id).orElse(null)
+        val entityOptional = repository.findById(id)
+        if (entityOptional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+        }
+        return entityOptional.get()
+    }
+
+    override fun findByAccount(account: Account): User {
+        val entityOptional = repository.findFirstByAccountId(account.id!!)
+        if (entityOptional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+        }
+        return entityOptional.get()
     }
 
     @Transactional
-    fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): User? {
+    override fun create(account: Account, firstName: String, lastName: String): User {
         val order = User(
-                firstName = pickupAddress,
-                lastName = deliveryAddress)
-        val entity = repository.save(order)
-        return entity
+                firstName,
+                lastName,
+                account.id!!)
+        return repository.save(order)
     }
 
     @Transactional

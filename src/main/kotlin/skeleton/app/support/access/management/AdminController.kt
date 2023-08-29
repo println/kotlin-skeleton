@@ -11,4 +11,5 @@ import skeleton.app.configuration.constants.Endpoints.ADMIN_
 @RequestMapping(ADMIN, ADMIN_)
 @PreAuthorize("hasRole('ADMIN')")
 class AdminController {
+
 }

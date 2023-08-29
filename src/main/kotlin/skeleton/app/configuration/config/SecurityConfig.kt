@@ -47,11 +47,11 @@ class SecurityConfig(
                                     AntPathRequestMatcher("/swagger-ui/**"),
                                     AntPathRequestMatcher("/swagger-ui.html")
                             ).permitAll()
-                            .requestMatchers("$MANAGEMENT/**").hasAnyRole(ADMIN.name, MANAGER.name)
-                            .requestMatchers(GET, "$MANAGEMENT/**").hasAnyAuthority(ADMIN_READ.name, MANAGER_READ.name)
-                            .requestMatchers(POST, "$MANAGEMENT/**").hasAnyAuthority(ADMIN_CREATE.name, MANAGER_CREATE.name)
-                            .requestMatchers(PUT, "$MANAGEMENT/**").hasAnyAuthority(ADMIN_UPDATE.name, MANAGER_UPDATE.name)
-                            .requestMatchers(DELETE, "$MANAGEMENT/**").hasAnyAuthority(ADMIN_DELETE.name, MANAGER_DELETE.name)
+                            .requestMatchers(AntPathRequestMatcher("$MANAGEMENT/**")).hasAnyRole(ADMIN.name, MANAGER.name)
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(GET, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_READ.name, MANAGER_READ.name)
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(POST, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_CREATE.name, MANAGER_CREATE.name)
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(PUT, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_UPDATE.name, MANAGER_UPDATE.name)
+                            .requestMatchers(AntPathRequestMatcher.antMatcher(DELETE, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_DELETE.name, MANAGER_DELETE.name)
                             .anyRequest().authenticated()
                 }
                 .sessionManagement { it.sessionCreationPolicy(STATELESS) }

@@ -1,8 +1,8 @@
-package skeleton.app.support.access.auth.basic.recovery.web
+package skeleton.app.support.access.issue.web
 
 import jakarta.validation.constraints.Email
 
-data class RecoveryEmailDto(
+data class ForgotPasswordEmailDto(
         @field: Email
         val email: String,
 )

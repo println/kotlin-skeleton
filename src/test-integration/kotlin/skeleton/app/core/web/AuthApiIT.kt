@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractIT
 import skeleton.app.configuration.constants.Endpoints
 import skeleton.app.core.web.AccountIT.Companion.generateAccount
-import skeleton.app.domain.user.User
+import skeleton.app.core.web.AccountIT.Companion.generateAccountRegister
 import skeleton.app.domain.user.UserRepository
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
@@ -19,6 +19,8 @@ import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthTokens
 import skeleton.app.support.access.auth.basic.auth.web.AuthController
 import skeleton.app.support.access.auth.basic.auth.web.AuthWebService
+import skeleton.app.support.access.issue.IssueRepository
+import skeleton.app.support.access.issue.IssueService
 import skeleton.app.support.access.session.Session
 import skeleton.app.support.access.session.SessionRepository
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
@@ -38,10 +40,16 @@ class AuthApiIT : AbstractIT() {
     private lateinit var sessionRepository: SessionRepository
 
     @Autowired
+    private lateinit var issueRepository: IssueRepository
+
+    @Autowired
     private lateinit var webService: AuthWebService
 
     @Autowired
     private lateinit var accountService: AccountService
+
+    @Autowired
+    private lateinit var issueService: IssueService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
@@ -55,31 +63,26 @@ class AuthApiIT : AbstractIT() {
         sessionRepository.deleteAll()
         accountRepository.deleteAll()
         userRepository.deleteAll()
+        issueRepository.deleteAll()
     }
 
     @Test
     fun register() {
-        val data = generateAccount()
+        val account = generateAccountRegister()
 
-        val result = restMockMvc.perform(post("$RESOURCE/register")
+        restMockMvc.perform(post("$RESOURCE/register")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(data.toJsonString()))
+                .content(account.toJsonString()))
                 .andExpect(status().isCreated)
                 .andReturn()
 
-        val authTokens: AuthTokens = result.response.contentAsString.toObject()
-        assertNotNull(authTokens.accessToken)
-        assertNotNull(authTokens.refreshToken)
+        assertTrue(accountRepository.findAll().isNotEmpty())
+        assertTrue(issueRepository.findAll().isNotEmpty())
+        assertTrue(userRepository.findAll().isNotEmpty())
+        assertTrue(sessionRepository.findAll().isEmpty())
 
-        val entitySessions: List<Session> = sessionRepository.findAll()
-        assertTrue(entitySessions.size == 1)
-
-        accountService.authenticate(data.login.username, data.login.password)
-        
-        val entityUsers: List<User> = userRepository.findAll()
-        assertTrue(entityUsers.isEmpty())
-
+        accountService.authenticate(account.email, account.password)
     }
 
     @Test

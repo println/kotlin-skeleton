@@ -10,7 +10,7 @@ import skeleton.app.support.web.AbstractWebService
 import java.util.*
 
 @Service
-class SessionWebService(private val service: SessionService): AbstractWebService<Session>() {
+class SessionWebService(private val service: SessionService): AbstractWebService() {
     fun findAll(filter: SessionFilter, pageable: Pageable): Page<Session> {
         return service.findAll(filter, pageable)
     }

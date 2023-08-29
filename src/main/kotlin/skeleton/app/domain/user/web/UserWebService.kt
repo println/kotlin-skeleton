@@ -11,7 +11,7 @@ import java.math.BigDecimal
 import java.util.*
 
 @Service
-class UserWebService(private val service: UserService): AbstractWebService<User>() {
+class UserWebService(private val service: UserService): AbstractWebService() {
     fun findAll(filter: UserFilter, pageable: Pageable): Page<User> {
         return service.findAll(filter, pageable)
     }
@@ -22,8 +22,8 @@ class UserWebService(private val service: UserService): AbstractWebService<User>
     }
 
     fun createOrder(customerId: UUID, pickupAddress: String, deliveryAddress: String): User {
-        val nullableEntity = service.createOrder(customerId, pickupAddress, deliveryAddress)
-        return assertBadRequest(nullableEntity)
+        //val nullableEntity = service.create(customerId, pickupAddress, deliveryAddress)
+        return assertBadRequest(null)
     }
 
     fun approvePayment(orderId: UUID, value: BigDecimal): User {

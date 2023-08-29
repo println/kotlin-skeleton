@@ -27,9 +27,9 @@ class AuthController(
     @PostMapping("/register")
     fun register(
             @Valid @RequestBody request: AuthRegisterRequest
-    ): ResponseEntity<AuthTokens> {
-        val token = authWebService.register(request)
-        return ResponseEntity((token), HttpStatus.CREATED)
+    ): ResponseEntity<Unit> {
+        authWebService.register(request)
+        return ResponseEntity(HttpStatus.CREATED)
     }
 
     @PostMapping("/authenticate")

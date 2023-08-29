@@ -7,4 +7,5 @@ import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
+    fun findFirstByAccountId(accountId: UUID): Optional<User>
 }

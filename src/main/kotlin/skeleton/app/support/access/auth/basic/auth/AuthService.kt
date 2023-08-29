@@ -8,20 +8,22 @@ import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.account.web.AccountRegisterDto
 import skeleton.app.support.access.auth.basic.jwt.JwtService
+import skeleton.app.support.access.issue.IssueService
+import skeleton.app.support.access.issue.IssueToken
 import skeleton.app.support.access.session.SessionService
 import java.util.*
 
 @Service
 class AuthService(
         private val accountService: AccountService,
+        private val issueService: IssueService,
         private val jwtService: JwtService,
         private val sessionService: SessionService) {
     @Transactional
-    fun register(authRegisterRequest: AuthRegisterRequest): AuthTokens {
-        val account = registerNewAccount(authRegisterRequest)
-        val tokens = generateTokens(account)
-        storeAccountToken(account, tokens)
-        return tokens
+    fun register(authRegisterRequest: AuthRegisterRequest): Account {
+        val entityAccount = registerNewAccount(authRegisterRequest)
+        createAccountActivationPendency(entityAccount)
+        return entityAccount
     }
 
     @Transactional
@@ -58,6 +60,10 @@ class AuthService(
                 authRegisterRequest.lastName,
                 authRegisterRequest.email,
                 authRegisterRequest.password))!!
+    }
+
+    private fun createAccountActivationPendency(account: Account): IssueToken?{
+        return issueService.createPendencyOfAccountActivation(account.id!!)
     }
 
     private fun authenticateAccount(authRequest: AuthRequest): Account {

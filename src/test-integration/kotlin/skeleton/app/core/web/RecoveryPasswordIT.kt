@@ -12,29 +12,28 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractIT
-import skeleton.app.configuration.constants.Endpoints.RECOVERY
+import skeleton.app.configuration.constants.Endpoints.FORGOT_PASSWORD
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.account.AccountService
-import skeleton.app.support.access.auth.basic.recovery.RecoveryRepository
-import skeleton.app.support.access.auth.basic.recovery.RecoveryToken
-import skeleton.app.support.access.auth.basic.recovery.web.RecoveryController
-import skeleton.app.support.access.auth.basic.recovery.web.RecoveryEmailDto
-import skeleton.app.support.access.auth.basic.recovery.web.RecoveryPasswordDto
-import skeleton.app.support.access.auth.basic.recovery.web.RecoveryWebService
+import skeleton.app.support.access.issue.IssueRepository
+import skeleton.app.support.access.issue.IssueToken
+import skeleton.app.support.access.issue.IssueType
+import skeleton.app.support.access.issue.web.ForgotPasswordController
+import skeleton.app.support.access.issue.web.ForgotPasswordDto
+import skeleton.app.support.access.issue.web.ForgotPasswordEmailDto
+import skeleton.app.support.access.issue.web.IssueWebService
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
-import java.time.Duration
-import java.time.Instant
-import java.util.*
+import java.time.LocalDateTime
 
 class RecoveryPasswordIT : AbstractIT() {
 
     companion object {
-        const val RESOURCE = RECOVERY
+        const val RESOURCE = FORGOT_PASSWORD
     }
 
     @Autowired
-    private lateinit var repository: RecoveryRepository
+    private lateinit var repository: IssueRepository
 
     @Autowired
     private lateinit var accountRepository: AccountRepository
@@ -43,13 +42,13 @@ class RecoveryPasswordIT : AbstractIT() {
     private lateinit var accountService: AccountService
 
     @Autowired
-    private lateinit var webService: RecoveryWebService
+    private lateinit var webService: IssueWebService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
 
     override fun createResource(): Any {
-        return RecoveryController(webService)
+        return ForgotPasswordController(webService)
     }
 
 
@@ -64,9 +63,9 @@ class RecoveryPasswordIT : AbstractIT() {
 
     @Test
     fun forgotPassword() {
-        val data = RecoveryEmailDto(account.email)
+        val data = ForgotPasswordEmailDto(account.email)
 
-        restMockMvc.perform(post("${RESOURCE}/forgot")
+        restMockMvc.perform(post(RESOURCE)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(data.toJsonString()))
@@ -78,11 +77,11 @@ class RecoveryPasswordIT : AbstractIT() {
 
     @Test
     fun changePassword() {
-        val entity = repository.save(RecoveryToken(account.id!!, "1234"))
+        val entity = repository.save(IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD))
         val newPassword = "newpassword"
-        val data = RecoveryPasswordDto(newPassword, entity.securityCode)
+        val data = ForgotPasswordDto(newPassword, entity.securityCode)
 
-        restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+        restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(data.toJsonString()))
@@ -96,9 +95,9 @@ class RecoveryPasswordIT : AbstractIT() {
 
         @Test
         fun forgotPassword_wrongEmail() {
-            val data = RecoveryEmailDto("xpto@xpto.com")
+            val data = ForgotPasswordEmailDto("xpto@xpto.com")
 
-            restMockMvc.perform(post("${RESOURCE}/forgot")
+            restMockMvc.perform(post(RESOURCE)
                     .accept(APPLICATION_JSON)
                     .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
@@ -110,13 +109,13 @@ class RecoveryPasswordIT : AbstractIT() {
 
         @Test
         fun changePassword_tokenExpired() {
-            val recoveryDate = Date.from(Instant.now().minus(Duration.ofHours(3)))
-            val token = RecoveryToken(account.id!!, "1234", recoveryDate)
+            val recoveryExpiration =LocalDateTime.now().minusHours(3)
+            val token = IssueToken(account.id!!, "1234", recoveryExpiration, IssueType.FORGOT_PASSWORD)
             val entity = repository.save(token)
             val newPassword = "newpassword"
-            val data = RecoveryPasswordDto(newPassword, entity.securityCode)
+            val data = ForgotPasswordDto(newPassword, entity.securityCode)
 
-            restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+            restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
                     .accept(APPLICATION_JSON)
                     .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
@@ -129,12 +128,12 @@ class RecoveryPasswordIT : AbstractIT() {
 
         @Test
         fun changePassword_wrongSecurityCode() {
-            val token = RecoveryToken(account.id!!, "1234")
+            val token = IssueToken(account.id!!, "1234", type = IssueType.FORGOT_PASSWORD)
             val entity = repository.save(token)
             val newPassword = "newpassword"
-            val data = RecoveryPasswordDto(newPassword, "5678")
+            val data = ForgotPasswordDto(newPassword, "5678")
 
-            restMockMvc.perform(post("${RESOURCE}/change-password/{token}", entity.id)
+            restMockMvc.perform(post("${RESOURCE}/renew/{token}", entity.id)
                     .accept(APPLICATION_JSON)
                     .contentType(APPLICATION_JSON)
                     .content(data.toJsonString()))
