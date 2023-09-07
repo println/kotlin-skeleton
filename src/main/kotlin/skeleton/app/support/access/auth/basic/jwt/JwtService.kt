@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import skeleton.app.configuration.properties.JwtProperties
+import skeleton.app.support.access.account.Account
 import java.security.Key
 import java.util.*
 
@@ -19,13 +20,17 @@ class JwtService(
 
     fun extractUsername(token: String): String = extractClaim(token, Claims::getSubject)
 
-    fun generateToken(userDetails: UserDetails): String = generateToken(HashMap(), userDetails, jwtProperties.expiration)
+    fun generateToken(account: Account): String = generateToken(
+            account,
+            jwtProperties.expiration)
 
-    fun generateRefreshToken(userDetails: UserDetails): String = generateToken(HashMap(), userDetails, jwtProperties.refreshExpiration)
+    fun generateRefreshToken(account: Account): String = generateToken(
+            account,
+            jwtProperties.refreshExpiration)
 
-    fun generateToken(extraClaims: Map<String, Any>, userDetails: UserDetails, expirationTime: Number): String = Jwts.builder()
-            .setClaims(extraClaims)
-            .setSubject(userDetails.username)
+    fun generateToken(account: Account, expirationTime: Number): String = Jwts.builder()
+            .setClaims(createExtraClaims(account))
+            .setSubject(account.username)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + expirationTime.toLong()))
             .signWith(getSignInKey(), HS256)
@@ -56,4 +61,8 @@ class JwtService(
         val keyBytes = Decoders.BASE64.decode(jwtProperties.secret)
         return Keys.hmacShaKeyFor(keyBytes)
     }
+
+    private fun createExtraClaims(account: Account) = mapOf(
+            account::name.name to account.name,
+            account::role.name to account.role)
 }

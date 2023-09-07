@@ -56,6 +56,7 @@ class AccountService(
         }
 
         val account = Account(
+                "${register.firstName} ${register.lastName}",
                 register.email,
                 Login(register.email, "")
         )

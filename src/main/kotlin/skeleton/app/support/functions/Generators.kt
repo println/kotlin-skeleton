@@ -26,5 +26,5 @@ object Generators {
                 upperCaseRule, digitRule)
     }
 
-    fun generateSecurityCode(length: Int = 4) = (0..9).shuffled().take(length).joinToString()
+    fun generateSecurityCode(length: Int = 4) = (0..9).shuffled().take(length).joinToString("")
 }

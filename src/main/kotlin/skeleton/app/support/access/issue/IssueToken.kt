@@ -4,14 +4,14 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Table
-import skeleton.app.configuration.constants.TableNames.Core.RECOVERY
+import skeleton.app.configuration.constants.TableNames.Core.ISSUE
 import skeleton.app.support.access.issue.IssueStatus.*
 import skeleton.app.support.jpa.AuditableModel
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = RECOVERY)
+@Table(name = ISSUE)
 class IssueToken(
         val accountId: UUID,
         val securityCode: String,

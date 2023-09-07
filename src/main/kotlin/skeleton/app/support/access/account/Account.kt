@@ -14,6 +14,8 @@ import skeleton.app.support.jpa.AuditableModel
 @Entity
 @Table(name = ACCOUNT)
 data class Account(
+        @Column(nullable = false)
+        var name: String,
         @Column(unique = true, nullable = false)
         var email: String,
         @OneToOne(

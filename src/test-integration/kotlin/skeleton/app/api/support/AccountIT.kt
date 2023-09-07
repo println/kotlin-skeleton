@@ -119,6 +119,7 @@ class AccountIT : AbstractWebIT<Account>() {
         const val RESOURCE = ACCOUNT
         fun createAccount(account: Account = generateAccount(), repository: AccountRepository, encoder: PasswordEncoder): Account {
             val data = Account(
+                    account.name,
                     account.email,
                     Login(account.login.username,
                             encoder.encode(account.login.password)))
@@ -126,11 +127,12 @@ class AccountIT : AbstractWebIT<Account>() {
         }
 
         fun generateAccount(): Account {
+            val name = faker.name().name()
             val login = Login(
                     easyRandom.nextObject(String::class.java) + "." + faker.internet().emailAddress(),
                     faker.internet().password(6, 128)
             )
-            return Account(login.username, login)
+            return Account(name, login.username, login)
         }
 
         fun generateAccountRegister(): AccountRegisterDto {

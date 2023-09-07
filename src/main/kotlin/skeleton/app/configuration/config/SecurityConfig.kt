@@ -32,16 +32,21 @@ class SecurityConfig(
     @Bean
     fun formLoginFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
+                .cors { it.disable() }
                 .csrf { it.disable() }
                 .authorizeHttpRequests {
                     it
                             .requestMatchers(
                                     AntPathRequestMatcher("$AUTH/**"),
                                     AntPathRequestMatcher(ACCOUNT_ACTIVATION),
+                                    AntPathRequestMatcher("/health"),
                                     AntPathRequestMatcher("/v3/api-docs"),
+                                    AntPathRequestMatcher("/v3/api-docs.yaml"),
                                     AntPathRequestMatcher("/v3/api-docs/**"),
                                     AntPathRequestMatcher("/swagger-ui/**"),
-                                    AntPathRequestMatcher("/swagger-ui.html")
+                                    AntPathRequestMatcher("/swagger-ui.html"),
+                                    AntPathRequestMatcher("/h2-console"),
+                                    AntPathRequestMatcher("/h2-console/**")
                             ).permitAll()
                             .requestMatchers(AntPathRequestMatcher("$MANAGEMENT/**")).hasAnyRole(ADMIN.name, MANAGER.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(GET, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_READ.name, MANAGER_READ.name)
@@ -49,6 +54,11 @@ class SecurityConfig(
                             .requestMatchers(AntPathRequestMatcher.antMatcher(PUT, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_UPDATE.name, MANAGER_UPDATE.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(DELETE, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_DELETE.name, MANAGER_DELETE.name)
                             .anyRequest().authenticated()
+                }
+                .headers {
+                    it.frameOptions { t ->
+                        t.sameOrigin()
+                    }
                 }
                 .sessionManagement { it.sessionCreationPolicy(STATELESS) }
                 .authenticationProvider(authenticationProvider)
