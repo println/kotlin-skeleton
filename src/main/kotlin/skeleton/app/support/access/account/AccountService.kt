@@ -41,24 +41,24 @@ class AccountService(
     }
 
     fun findByEmail(email: String): Optional<Account?> {
-        return repository.findByEmail(email)
+        return repository.findByEmail(email.lowercase())
     }
 
     @Transactional
     fun register(@Valid register: AccountRegisterDto): Account? {
         AccountPolicies.assertName(register.firstName)
         AccountPolicies.assertName(register.lastName)
-        AccountPolicies.assertEmail(register.email)
+        AccountPolicies.assertEmail(register.email.lowercase())
         AccountPolicies.assertPassword(register.password)
 
-        if (repository.existsByEmail(register.email)) {
+        if (repository.existsByEmail(register.email.lowercase())) {
             return null
         }
 
         val account = Account(
                 "${register.firstName} ${register.lastName}",
-                register.email,
-                Login(register.email, "")
+                register.email.lowercase(),
+                Login(register.email.lowercase(), "")
         )
         setPassword(account, register.password)
         val entityAccount = repository.save(account)
@@ -70,12 +70,12 @@ class AccountService(
 
 
     fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): Account {
-        AccountPolicies.assertEmail(updateLogin.email)
+        AccountPolicies.assertEmail(updateLogin.email.lowercase())
         AccountPolicies.assertPassword(updateLogin.password)
 
         val entity = findById(id)
-        entity.email = updateLogin.email
-        entity.login.username = updateLogin.email
+        entity.email = updateLogin.email.lowercase()
+        entity.login.username = updateLogin.email.lowercase()
         setPassword(entity, updateLogin.password)
         return repository.save(entity)
     }
@@ -130,9 +130,9 @@ class AccountService(
     @Transactional
     fun authenticate(email: String, password: String): Account {
         authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(email, password)
+                UsernamePasswordAuthenticationToken(email.lowercase(), password)
         )
-        return repository.findByEmail(email).get()
+        return repository.findByEmail(email.lowercase()).get()
     }
 
 
