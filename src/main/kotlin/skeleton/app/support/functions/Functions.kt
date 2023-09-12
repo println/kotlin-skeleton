@@ -28,4 +28,8 @@ object Functions {
             return true
         }
     }
+
+    object Text{
+        fun cleaner(word: String) = word.lowercase().trim()
+    }
 }

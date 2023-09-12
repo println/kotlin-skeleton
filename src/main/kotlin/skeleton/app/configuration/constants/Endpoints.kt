@@ -8,7 +8,7 @@ object Endpoints {
     const val AUTH_ = "${AUTH}/"
     const val ACCOUNT = "${V1}/account"
     const val ACCOUNT_ = "${ACCOUNT}/"
-    const val SESSION = "${V1}/session/"
+    const val SESSION = "${V1}/session"
     const val SESSION_ = "${SESSION}/"
     const val ACCOUNT_ISSUE = "${ACCOUNT}/issue"
     const val ACCOUNT_ACTIVATION = "${ACCOUNT}/activation"

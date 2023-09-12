@@ -53,7 +53,7 @@ class SecurityConfig(
                             .requestMatchers(AntPathRequestMatcher.antMatcher(POST, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_CREATE.name, MANAGER_CREATE.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(PUT, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_UPDATE.name, MANAGER_UPDATE.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(DELETE, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_DELETE.name, MANAGER_DELETE.name)
-                            .anyRequest().authenticated()
+                            .anyRequest().permitAll()
                 }
                 .headers {
                     it.frameOptions { t ->

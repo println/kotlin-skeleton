@@ -10,7 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import skeleton.app.support.extensions.ClassExtensions.toObject
 import skeleton.app.support.jpa.AuditableModel
+import skeleton.app.support.web.ResponsePage
 import java.util.*
 
 abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
@@ -43,7 +45,7 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
             "?page=10, false, 9, true"
     )
     fun getAll(page: String, first: Boolean, index: Int, last: Boolean) {
-        restMockMvc.perform(get("${getResource()}$page")
+        val result = restMockMvc.perform(get("${getResource()}$page")
                 .accept(APPLICATION_JSON))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(APPLICATION_JSON_VALUE))
@@ -54,6 +56,8 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
                 .andExpect(jsonPath("\$.totalPages").value(10))
                 .andExpect(jsonPath("\$.numberOfElements").value(20))
                 .andExpect(jsonPath("\$.size").value(20))
+                .andReturn()
+        val response: ResponsePage = result.response.contentAsString.toObject()
     }
 
     @Test

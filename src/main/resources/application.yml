@@ -1,6 +1,8 @@
 server:
   port : ${PORT:8085}
 
+
+
 spring:
   application:
     name: @project.name@
@@ -14,8 +16,10 @@ spring:
     url: jdbc:h2:mem:skeleton-db;Mode=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE,USER
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
   sql:
     init:
+      mode: always
       platform: h2
       continue-on-error: 'true'
 
@@ -29,7 +33,7 @@ spring:
 #      lob:
 #        non_contextual_creation: true
   hibernate:
-    ddl-auto: none
+    ddl-auto: create
   data:
     web:
       pageable:

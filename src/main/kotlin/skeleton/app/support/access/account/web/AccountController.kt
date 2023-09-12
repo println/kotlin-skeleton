@@ -9,28 +9,29 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT_
-import skeleton.app.domain.user.UserFilter
+import skeleton.app.support.access.account.AccountFilter
 import java.net.URI
 import java.util.*
 
 
 @RequestMapping(ACCOUNT, ACCOUNT_)
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 class AccountController(
         private val service: AccountWebService
 ) {
 
     @GetMapping
-    @PreAuthorize("hasAuthority('admin:read')")
+    //@PreAuthorize("hasAuthority('admin:read')")
     fun getAll(
-            pageable: Pageable): Page<AccountDto> {
-        val filter = UserFilter()
+            pageable: Pageable,
+          ): Page<AccountDto> {
+        val filter = AccountFilter()
         return service.findAll(filter, pageable)
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin:read')")
+    //@PreAuthorize("hasAuthority('admin:read')")
     fun getById(
             @PathVariable("id") id: UUID): AccountDto {
         return service.findById(id)

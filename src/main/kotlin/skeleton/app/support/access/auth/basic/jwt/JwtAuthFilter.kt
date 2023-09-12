@@ -42,7 +42,7 @@ class JwtAuthFilter(
             val userDetails = userDetailsService.loadUserByUsername(username)
 
             val isTokenValid = sessionService.findByToken(jwt)
-                    .map { it!!.expired && !it.revoked }
+                    .map { !it!!.expired && !it.revoked }
                     ?.orElse(false)
 
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid!!) {

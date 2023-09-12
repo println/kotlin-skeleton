@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import skeleton.app.domain.user.UserFilter
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.issue.IssuePolicies.assertValidAccount
@@ -24,7 +23,7 @@ class IssueService(
         private val accountService: AccountService,
         private val notifier: IssueNotifier
 ) {
-    fun findAll(userFilter: UserFilter, pageable: Pageable): Page<IssueToken> {
+    fun findAll(filter: IssueFilter, pageable: Pageable): Page<IssueToken> {
         val specification: Specification<IssueToken> = Specification.where(null)
         return repository.findAll(specification, pageable)
     }

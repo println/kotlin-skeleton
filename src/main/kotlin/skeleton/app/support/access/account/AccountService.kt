@@ -11,11 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import skeleton.app.domain.user.UserFilter
 import skeleton.app.support.access.AccountUserService
 import skeleton.app.support.access.account.web.AccountRegisterDto
 import skeleton.app.support.access.account.web.UpdateLoginDto
 import skeleton.app.support.access.login.Login
+import skeleton.app.support.functions.Functions
 import skeleton.app.support.functions.Generators
 import java.util.*
 
@@ -27,7 +27,7 @@ class AccountService(
         private val accountUserService: AccountUserService
 ) {
 
-    fun findAll(userFilter: UserFilter, pageable: Pageable): Page<Account> {
+    fun findAll(filter: AccountFilter, pageable: Pageable): Page<Account> {
         val specification: Specification<Account> = Specification.where(null)
         return repository.findAll(specification, pageable)
     }
@@ -41,24 +41,26 @@ class AccountService(
     }
 
     fun findByEmail(email: String): Optional<Account?> {
-        return repository.findByEmail(email.lowercase())
+        val cleanedEmail = cleaner(email)
+        return repository.findByEmail(cleanedEmail)
     }
 
     @Transactional
     fun register(@Valid register: AccountRegisterDto): Account? {
+        val cleanedEmail = cleaner(register.email)
         AccountPolicies.assertName(register.firstName)
         AccountPolicies.assertName(register.lastName)
-        AccountPolicies.assertEmail(register.email.lowercase())
+        AccountPolicies.assertEmail(cleanedEmail)
         AccountPolicies.assertPassword(register.password)
 
-        if (repository.existsByEmail(register.email.lowercase())) {
+        if (repository.existsByEmail(cleanedEmail)) {
             return null
         }
 
         val account = Account(
                 "${register.firstName} ${register.lastName}",
-                register.email.lowercase(),
-                Login(register.email.lowercase(), "")
+                cleanedEmail,
+                Login(cleanedEmail, "")
         )
         setPassword(account, register.password)
         val entityAccount = repository.save(account)
@@ -70,12 +72,13 @@ class AccountService(
 
 
     fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): Account {
-        AccountPolicies.assertEmail(updateLogin.email.lowercase())
+        val cleanedEmail = cleaner(updateLogin.email)
+        AccountPolicies.assertEmail(cleanedEmail)
         AccountPolicies.assertPassword(updateLogin.password)
 
         val entity = findById(id)
-        entity.email = updateLogin.email.lowercase()
-        entity.login.username = updateLogin.email.lowercase()
+        entity.email = cleanedEmail
+        entity.login.username = cleanedEmail
         setPassword(entity, updateLogin.password)
         return repository.save(entity)
     }
@@ -129,10 +132,11 @@ class AccountService(
 
     @Transactional
     fun authenticate(email: String, password: String): Account {
+        val cleanedEmail = cleaner(email)
         authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(email.lowercase(), password)
+                UsernamePasswordAuthenticationToken(cleanedEmail, password)
         )
-        return repository.findByEmail(email.lowercase()).get()
+        return repository.findByEmail(cleanedEmail).get()
     }
 
 
@@ -146,4 +150,6 @@ class AccountService(
         entity.status = status
         return repository.save(entity)
     }
+
+    private fun cleaner(username: String) = Functions.Text.cleaner(username)
 }

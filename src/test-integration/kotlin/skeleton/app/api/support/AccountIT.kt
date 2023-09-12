@@ -15,6 +15,7 @@ import skeleton.app.support.access.account.*
 import skeleton.app.support.access.account.web.*
 import skeleton.app.support.access.login.Login
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
+import skeleton.app.support.functions.Functions
 
 class AccountIT : AbstractWebIT<Account>() {
 
@@ -129,7 +130,7 @@ class AccountIT : AbstractWebIT<Account>() {
         fun generateAccount(): Account {
             val name = faker.name().name()
             val login = Login(
-                    easyRandom.nextObject(String::class.java) + "." + faker.internet().emailAddress(),
+                    Functions.Text.cleaner(easyRandom.nextObject(String::class.java) + "." + faker.internet().emailAddress()),
                     faker.internet().password(6, 128)
             )
             return Account(name, login.username, login)

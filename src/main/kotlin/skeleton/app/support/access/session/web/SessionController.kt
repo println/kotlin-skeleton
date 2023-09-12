@@ -19,8 +19,7 @@ class SessionController(
 ) {
 
     @GetMapping
-    fun getAll(
-            pageable: Pageable): Page<Session> {
+    fun getAll(pageable: Pageable): Page<Session> {
         val filter = SessionFilter()
         return service.findAll(filter, pageable)
     }

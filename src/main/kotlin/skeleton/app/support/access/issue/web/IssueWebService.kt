@@ -3,9 +3,9 @@ package skeleton.app.support.access.issue.web
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import skeleton.app.domain.user.UserFilter
 import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.web.AccountDto
+import skeleton.app.support.access.issue.IssueFilter
 import skeleton.app.support.access.issue.IssueService
 import skeleton.app.support.access.issue.IssueToken
 import skeleton.app.support.web.AbstractWebService
@@ -16,7 +16,7 @@ class IssueWebService(
         private val service: IssueService
 ) : AbstractWebService() {
 
-    fun findAll(filter: UserFilter, pageable: Pageable): Page<IssueToken> {
+    fun findAll(filter: IssueFilter, pageable: Pageable): Page<IssueToken> {
         return service.findAll(filter, pageable)
     }
 
