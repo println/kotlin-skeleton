@@ -21,9 +21,7 @@ class UserController(val service: UserWebService) {
     }
 
     @GetMapping
-    fun getAll(
-            @RequestParam(value = "search", required = false) search: String,
-            @RequestParam(required = false) pageable: Pageable): Page<User> {
+    fun getAll(pageable: Pageable): Page<User> {
         val filter = UserFilter()
         return service.findAll(filter, pageable)
     }

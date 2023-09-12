@@ -18,8 +18,7 @@ class IssueController(
     @GetMapping
     @PreAuthorize("hasAuthority('admin:read')")
     fun getAll(
-            @RequestParam(value = "search", required = false) search: String,
-            @RequestParam(required = false) pageable: Pageable): Page<IssueToken> {
+            pageable: Pageable): Page<IssueToken> {
         val filter = IssueFilter()
         return webService.findAll(filter, pageable)
     }
