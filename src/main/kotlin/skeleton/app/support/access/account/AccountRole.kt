@@ -29,7 +29,7 @@ enum class AccountRole(
     fun getAuthorities(): List<SimpleGrantedAuthority> {
         val authorities = this.permissions
                 .stream()
-                .map { permission -> SimpleGrantedAuthority(permission.name) }
+                .map { permission -> SimpleGrantedAuthority(permission.permission) }
                 .collect(Collectors.toList())
         authorities.add(SimpleGrantedAuthority("ROLE_$name"))
         return authorities

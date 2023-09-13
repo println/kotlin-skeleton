@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.*
 import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -23,7 +24,7 @@ import skeleton.app.support.access.auth.basic.jwt.JwtAuthFilter
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
         private val jwtAuthFilter: JwtAuthFilter,
         private val authenticationProvider: AuthenticationProvider,
@@ -32,7 +33,7 @@ class SecurityConfig(
     @Bean
     fun formLoginFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
-                .cors { it.disable() }
+                .cors {  }
                 .csrf { it.disable() }
                 .authorizeHttpRequests {
                     it
@@ -53,8 +54,9 @@ class SecurityConfig(
                             .requestMatchers(AntPathRequestMatcher.antMatcher(POST, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_CREATE.name, MANAGER_CREATE.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(PUT, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_UPDATE.name, MANAGER_UPDATE.name)
                             .requestMatchers(AntPathRequestMatcher.antMatcher(DELETE, "$MANAGEMENT/**")).hasAnyAuthority(ADMIN_DELETE.name, MANAGER_DELETE.name)
-                            .anyRequest().permitAll()
+                            .anyRequest().authenticated()
                 }
+                .httpBasic(Customizer.withDefaults())
                 .headers {
                     it.frameOptions { t ->
                         t.sameOrigin()
