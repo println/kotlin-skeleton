@@ -3,7 +3,6 @@ package skeleton.app.support.access.account
 
 import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import skeleton.app.configuration.constants.TableNames.Core.ACCOUNT
 import skeleton.app.support.access.account.AccountRole.*
@@ -29,8 +28,8 @@ data class Account(
         var status: AccountStatus = ACTIVE,
         var issues: Int = 0
 ) : AuditableModel<Account>(), UserDetails {
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf(SimpleGrantedAuthority(this.role.name))
+    override fun getAuthorities(): List<GrantedAuthority> {
+        return role.getAuthorities()
     }
 
     override fun getPassword(): String {

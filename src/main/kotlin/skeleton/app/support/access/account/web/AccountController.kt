@@ -16,13 +16,13 @@ import java.util.*
 
 @RequestMapping(ACCOUNT, ACCOUNT_)
 @RestController
-//@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 class AccountController(
         private val service: AccountWebService
 ) {
 
     @GetMapping
-    //@PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAuthority('admin:read')")
     fun getAll(
             pageable: Pageable,
           ): Page<AccountDto> {
@@ -31,7 +31,7 @@ class AccountController(
     }
 
     @GetMapping("/{id}")
-    //@PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAuthority('admin:read')")
     fun getById(
             @PathVariable("id") id: UUID): AccountDto {
         return service.findById(id)
