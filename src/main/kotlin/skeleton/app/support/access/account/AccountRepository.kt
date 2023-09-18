@@ -7,7 +7,7 @@ import java.util.*
 
 @Repository
 interface AccountRepository: JpaRepository<Account, UUID>, JpaSpecificationExecutor<Account> {
-    fun findByEmail(email: String): Optional<Account?>
+    fun findByEmail(email: String): Optional<Account>
 
     fun existsByEmail(email: String): Boolean
 }

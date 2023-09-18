@@ -1,6 +1,4 @@
-package skeleton.app.support.access.account.web
-
-import skeleton.app.support.access.account.Account
+package skeleton.app.support.access.account
 
 class AccountDto (private val account: Account){
     val id = account.id

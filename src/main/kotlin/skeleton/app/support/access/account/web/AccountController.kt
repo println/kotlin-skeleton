@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT_
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.account.AccountFilter
 import java.net.URI
 import java.util.*

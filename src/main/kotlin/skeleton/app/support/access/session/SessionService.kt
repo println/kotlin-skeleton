@@ -1,37 +1,53 @@
 package skeleton.app.support.access.session
 
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import skeleton.app.support.access.account.Account
 import java.util.*
+import java.util.function.Function
 
 @Service
 class SessionService(
         private val repository: SessionRepository) {
 
-    fun findAll(filter: SessionFilter, pageable: Pageable): Page<Session> {
+    fun findAll(filter: SessionFilter, pageable: Pageable): Page<SessionDto> {
+        var pageParam = pageable
+        if (!pageable.sort.isSorted) {
+            val sort = Sort.by(
+                    Sort.Order.asc(Session::revoked.name),
+                    Sort.Order.asc(Session::expired.name),
+                    Sort.Order.desc(Session::createdAt.name))
+            pageParam = PageRequest.of(pageable.pageNumber, pageable.pageSize, sort)
+        }
+
         val specification: Specification<Session> = Specification.where(null)
-        return repository.findAll(specification, pageable)
+        val page = repository.findAll(specification, pageParam)
+        val converter = Function<Session?, SessionDto> {
+            SessionDto(it)
+        }
+        return page.map(converter);
     }
 
-    fun findById(id: UUID): Optional<Session?> {
-        return repository.findById(id)
+    fun findById(id: UUID): Optional<SessionDto> {
+        return repository.findById(id).map { SessionDto(it) }
     }
 
-    fun add(account: Account, jwtToken: String): Session {
+    fun start(account: Account, jwtToken: String): SessionDto {
         val session = Session(
-                accountId = account.id!!,
+                account = account,
                 token = jwtToken,
                 expired = false,
                 revoked = false
         )
-        return repository.save(session);
+        return SessionDto(repository.save(session))
     }
 
-    fun revokeAllUserTokens(account: Account) {
-        val entities = repository.findAllByAccountIdAndExpiredIsFalseAndRevokedIsFalse(account.id)
+    fun revokeAllSessionsByAccount(accountId: UUID) {
+        val entities = repository.findAllByAccountIdAndExpiredIsFalseAndRevokedIsFalse(accountId)
 
         if (entities.isNotEmpty()) {
             entities.forEach {
@@ -42,8 +58,8 @@ class SessionService(
         }
     }
 
-    fun save(session: Session): Session {
-        return repository.save(session);
+    fun save(session: Session): SessionDto {
+        return SessionDto(repository.save(session))
     }
 
     fun findByToken(token: String): Optional<Session> {

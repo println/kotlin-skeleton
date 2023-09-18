@@ -2,6 +2,7 @@ package skeleton.app
 
 import org.hamcrest.Matchers.*
 import org.jeasy.random.EasyRandom
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -16,6 +17,10 @@ import skeleton.app.support.web.ResponsePage
 import java.util.*
 
 abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
+    companion object {
+        const val TOTAL = 200
+    }
+
     val easyRandom = EasyRandom()
     var entities = listOf<AuditableModel<T>>()
 
@@ -31,10 +36,11 @@ abstract class AbstractWebIT<T : AuditableModel<T>> : AbstractIT() {
     }
 
     fun reloadData(adjustment: (T) -> T) {
-        val data = easyRandom.objects(getEntityType(), 200).toList()
+        val data = easyRandom.objects(getEntityType(), TOTAL).toList()
         val processedData = data.map { adjustment(it) }
         getRepository().deleteAll()
         entities = getRepository().saveAllAndFlush(processedData)
+        Assertions.assertEquals(TOTAL.toLong(), getRepository().count())
     }
 
     @ParameterizedTest

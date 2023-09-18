@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import skeleton.app.support.access.account.Account
-import skeleton.app.support.access.account.web.AccountDto
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.issue.IssueFilter
 import skeleton.app.support.access.issue.IssueService
 import skeleton.app.support.access.issue.IssueToken
@@ -47,13 +47,13 @@ class IssueWebService(
 
     fun resolveAccountActivation(token: UUID): AccountDto {
         val nullableEntity = service.resolveAccountActivation(token)
-        val entity: Account = assertNotFound(nullableEntity)
-        return AccountDto(entity)
+        val entity: AccountDto = assertNotFound(nullableEntity)
+        return entity
     }
 
-    fun forceResolveAccountActivation(accountId: UUID): AccountDto  {
+    fun forceResolveAccountActivation(accountId: UUID): AccountDto {
         val nullableEntity = service.forceResolveAccountActivation(accountId)
-        val entity: Account = assertNotFound(nullableEntity)
-        return AccountDto(entity)
+        val entity: AccountDto = assertNotFound(nullableEntity)
+        return entity
     }
 }

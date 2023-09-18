@@ -3,6 +3,7 @@ package skeleton.app.support.access.issue.email
 import org.springframework.stereotype.Component
 import skeleton.app.configuration.constants.Endpoints
 import skeleton.app.support.access.account.Account
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.issue.IssueToken
 import skeleton.app.support.notification.NotificationService
 
@@ -10,7 +11,7 @@ import skeleton.app.support.notification.NotificationService
 class IssueNotifier(
         private val notificationService: NotificationService
 ) {
-    fun notifyPasswordRecoveryRequested(token: IssueToken, account: Account) {
+    fun notifyPasswordRecoveryRequested(token: IssueToken, account: AccountDto) {
         val recipients = listOf(account.email)
         val subject = "Password Recovery"
         val message = """
@@ -23,7 +24,7 @@ class IssueNotifier(
         notificationService.notifyByEmail(recipients, subject, message)
     }
 
-    fun notifyYourAccountHasBeenPasswordResetToATemporaryPassword(token: IssueToken, account: Account) {
+    fun notifyYourAccountHasBeenPasswordResetToATemporaryPassword(token: IssueToken, account: AccountDto) {
         val recipients = listOf(account.email)
         val subject = "Your account has been password reset to a temporary password"
         val message = """
@@ -41,7 +42,7 @@ class IssueNotifier(
         notificationService.notifyByEmail(recipients, subject, message)
     }
 
-    fun notifyAccountHasBeenActivated(account: Account) {
+    fun notifyAccountHasBeenActivated(account: AccountDto) {
         val recipients = listOf(account.email)
         val subject = "Your Account has been activated successfully!"
         val message = """

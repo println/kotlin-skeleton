@@ -2,7 +2,7 @@ package skeleton.app.support.access.issue
 
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.server.ResponseStatusException
-import skeleton.app.support.access.account.Account
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.account.AccountStatus
 import java.time.LocalDateTime
 import java.util.*
@@ -12,7 +12,7 @@ object IssuePolicies {
     const val EXPIRATION_TEMPORARY_PASSWORD_DAYS = 30L
     const val EXPIRATION_ACCOUNT_ACTIVATION_DAYS = 30L
 
-    fun assertValidAccount(account: Account){
+    fun assertValidAccount(account: AccountDto){
         if(account.status ==  AccountStatus.BLOCKED){
             throw ResponseStatusException(FORBIDDEN, "You cannot proceed with your request")
         }

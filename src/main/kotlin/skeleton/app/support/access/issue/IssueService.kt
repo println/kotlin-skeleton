@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import skeleton.app.support.access.account.Account
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.issue.IssuePolicies.assertValidAccount
 import skeleton.app.support.access.issue.IssueStatus.*
@@ -86,7 +87,7 @@ class IssueService(
 
     @Transactional
     fun createPendencyOfTemporaryPassword(accountId: UUID): String {
-        lateinit var entityAccount: Account
+        lateinit var entityAccount: AccountDto
 
         try {
             entityAccount = accountService.findById(accountId)
@@ -120,7 +121,7 @@ class IssueService(
     }
 
     @Transactional
-    fun resolveAccountActivation(tokenId: UUID): Account {
+    fun resolveAccountActivation(tokenId: UUID): AccountDto {
         val entityTokenOptional = repository.findById(tokenId)
 
         IssuePolicies.assertValidAccountActivation(entityTokenOptional)
@@ -130,7 +131,7 @@ class IssueService(
     }
 
     @Transactional
-    fun forceResolveAccountActivation(accountId: UUID): Account? {
+    fun forceResolveAccountActivation(accountId: UUID): AccountDto? {
         val entityTokenOptional = repository.findFirstByAccountIdAndStatus(accountId)
 
         if (entityTokenOptional.isEmpty) {
@@ -141,7 +142,7 @@ class IssueService(
         return resolveAccountActivation(entityToken)
     }
 
-    private fun resolveAccountActivation(entityToken: IssueToken): Account {
+    private fun resolveAccountActivation(entityToken: IssueToken): AccountDto {
         val entityAccount = accountService.findById(entityToken.accountId)
         accountService.decrementIssues(entityAccount.id!!)
 
@@ -156,7 +157,7 @@ class IssueService(
         repository.save(entityToken)
     }
 
-    private fun openPending(entityAccount: Account, type: IssueType): IssueToken {
+    private fun openPending(entityAccount: AccountDto, type: IssueType): IssueToken {
         val securityCode = Generators.generateSecurityCode()
         val token = IssueToken(
                 accountId = entityAccount.id!!,

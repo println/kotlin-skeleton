@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import skeleton.app.support.access.account.Account
+import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.auth.basic.auth.AuthRegisterRequest
 import skeleton.app.support.access.auth.basic.auth.AuthRequest
 import skeleton.app.support.access.auth.basic.auth.AuthService
@@ -19,7 +19,7 @@ class AuthWebService(
         private val authService: AuthService
 ) : AbstractWebService() {
 
-    fun register(authRegisterRequest: AuthRegisterRequest): Account {
+    fun register(authRegisterRequest: AuthRegisterRequest): AccountDto {
         val nullableEntity = authService.register(authRegisterRequest)
         return assertBadRequest(nullableEntity)
     }

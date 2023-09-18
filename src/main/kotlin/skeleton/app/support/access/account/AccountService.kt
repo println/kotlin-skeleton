@@ -18,6 +18,7 @@ import skeleton.app.support.access.login.Login
 import skeleton.app.support.functions.Functions
 import skeleton.app.support.functions.Generators
 import java.util.*
+import java.util.function.Function
 
 @Service
 class AccountService(
@@ -27,27 +28,32 @@ class AccountService(
         private val accountUserService: AccountUserService
 ) {
 
-    fun findAll(filter: AccountFilter, pageable: Pageable): Page<Account> {
+    fun findAll(filter: AccountFilter, pageable: Pageable): Page<AccountDto> {
         val specification: Specification<Account> = Specification.where(null)
-        return repository.findAll(specification, pageable)
-    }
-
-    fun findById(id: UUID): Account {
-        val entityOptional = repository.findById(id)
-        if (entityOptional.isEmpty) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+        val page = repository.findAll(specification, pageable)
+        val converter = Function<Account?, AccountDto> {
+            AccountDto(it)
         }
-        return entityOptional.get()
+        return page.map(converter)
     }
 
-    fun findByEmail(email: String): Optional<Account?> {
-        val cleanedEmail = cleaner(email)
+    fun findById(id: UUID): AccountDto {
+        return AccountDto(getById(id))
+    }
+
+    fun findByEmail(email: String): Optional<AccountDto> {
+        val cleanedEmail = clear(email)
+        return repository.findByEmail(cleanedEmail).map { AccountDto(it) }
+    }
+
+    fun findAccountByUsername(username: String): Optional<Account> {
+        val cleanedEmail = clear(username)
         return repository.findByEmail(cleanedEmail)
     }
 
     @Transactional
-    fun register(@Valid register: AccountRegisterDto): Account? {
-        val cleanedEmail = cleaner(register.email)
+    fun register(@Valid register: AccountRegisterDto): AccountDto? {
+        val cleanedEmail = clear(register.email)
         AccountPolicies.assertName(register.firstName)
         AccountPolicies.assertName(register.lastName)
         AccountPolicies.assertEmail(cleanedEmail)
@@ -67,39 +73,38 @@ class AccountService(
 
         accountUserService.create(entityAccount, register.firstName, register.lastName)
 
-        return entityAccount
+        return AccountDto(entityAccount)
     }
 
-
-    fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): Account {
-        val cleanedEmail = cleaner(updateLogin.email)
+    fun updateCredentials(id: UUID, @Valid updateLogin: UpdateLoginDto): AccountDto {
+        val cleanedEmail = clear(updateLogin.email)
         AccountPolicies.assertEmail(cleanedEmail)
         AccountPolicies.assertPassword(updateLogin.password)
 
-        val entity = findById(id)
+        val entity = getById(id)
         entity.email = cleanedEmail
         entity.login.username = cleanedEmail
         setPassword(entity, updateLogin.password)
-        return repository.save(entity)
+        return AccountDto(repository.save(entity))
     }
 
     @Transactional
     fun updateRole(id: UUID, role: AccountRole): Account {
-        val entity = findById(id)
+        val entity = getById(id)
         entity.role = role
         return repository.save(entity)
     }
 
     @Transactional
     fun incrementIssues(id: UUID): Account {
-        val entity = findById(id)
+        val entity = getById(id)
         entity.issues += 1
         return repository.save(entity)
     }
 
     @Transactional
     fun decrementIssues(id: UUID): Account {
-        val entity = findById(id)
+        val entity = getById(id)
         entity.issues = if (entity.issues <= 0) 0 else entity.issues - 1
         return repository.save(entity)
     }
@@ -116,14 +121,14 @@ class AccountService(
 
     @Transactional
     fun changePassword(id: UUID, password: String): Account {
-        val entity = findById(id)
+        val entity = getById(id)
         setPassword(entity, password)
         return repository.save(entity)
     }
 
     @Transactional
     fun assignNewTemporaryPassword(id: UUID): String {
-        val entity = findById(id)
+        val entity = getById(id)
         val tempPassword = Generators.generatePassword()
         setPassword(entity, tempPassword)
         repository.save(entity)
@@ -132,11 +137,19 @@ class AccountService(
 
     @Transactional
     fun authenticate(email: String, password: String): Account {
-        val cleanedEmail = cleaner(email)
+        val cleanedEmail = clear(email)
         authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(cleanedEmail, password)
         )
         return repository.findByEmail(cleanedEmail).get()
+    }
+
+    private fun getById(id: UUID): Account {
+        val entityOptional = repository.findById(id)
+        if (entityOptional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+        }
+        return entityOptional.get()
     }
 
 
@@ -146,10 +159,12 @@ class AccountService(
     }
 
     private fun updateStatus(id: UUID, status: AccountStatus): Account {
-        val entity = findById(id)
+        val entity = getById(id)
         entity.status = status
         return repository.save(entity)
     }
 
-    private fun cleaner(username: String) = Functions.Text.cleaner(username)
+    private fun clear(username: String) = Functions.Text.cleaner(username)
+
+
 }

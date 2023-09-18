@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import skeleton.app.configuration.constants.Endpoints.SESSION
 import skeleton.app.configuration.constants.Endpoints.SESSION_
-import skeleton.app.support.access.session.Session
+import skeleton.app.support.access.session.SessionDto
 import skeleton.app.support.access.session.SessionFilter
 import java.util.*
 
@@ -21,7 +21,8 @@ class SessionController(
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    fun getAll(pageable: Pageable): Page<Session> {
+    fun getAll(
+            pageable: Pageable): Page<SessionDto> {
         val filter = SessionFilter()
         return service.findAll(filter, pageable)
     }
@@ -29,7 +30,7 @@ class SessionController(
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getById(
-            @PathVariable("id") id: UUID): Session {
+            @PathVariable("id") id: UUID): SessionDto {
         return service.findById(id)
     }
 }
