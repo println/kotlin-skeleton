@@ -20,11 +20,9 @@ import skeleton.app.support.access.issue.IssueRepository
 import skeleton.app.support.access.issue.IssueStatus.*
 import skeleton.app.support.access.issue.IssueToken
 import skeleton.app.support.access.issue.IssueType
-import skeleton.app.support.access.issue.web.ForgotPasswordController
-import skeleton.app.support.access.issue.web.ForgotPasswordDto
-import skeleton.app.support.access.issue.web.ForgotPasswordEmailDto
-import skeleton.app.support.access.issue.web.IssueWebService
+import skeleton.app.support.access.issue.web.*
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
+import skeleton.app.support.extensions.ClassExtensions.toObject
 import java.time.LocalDateTime
 
 class AccountPasswordForgotIT : AbstractIT() {
@@ -51,7 +49,6 @@ class AccountPasswordForgotIT : AbstractIT() {
     override fun createResource(): Any {
         return ForgotPasswordController(webService)
     }
-
 
     private lateinit var account: Account
 
@@ -84,7 +81,7 @@ class AccountPasswordForgotIT : AbstractIT() {
         val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD)
         val entityToken = repository.save(token)
         val newPassword = "newpassword"
-        val data = ForgotPasswordDto(entityToken.id!!, newPassword, entityToken.securityCode)
+        val data = ForgotPasswordDto(entityToken.id!!, newPassword)
 
         restMockMvc.perform(post("$RESOURCE/renew")
                 .accept(APPLICATION_JSON)
@@ -97,8 +94,33 @@ class AccountPasswordForgotIT : AbstractIT() {
         assertTrue(account.issues == 0)
     }
 
+    @Test
+    fun findTokenBySecurityCode() {
+        val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD)
+        repository.save(token)
+
+        val result = restMockMvc.perform(get("$RESOURCE/code/{code}", token.securityCode)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andReturn()
+
+        val tokenDto: ForgotPasswordTokenDto = result.response.contentAsString.toObject()
+        assertEquals(token.id!!, tokenDto.token)
+    }
+
     @Nested
     inner class Fails {
+
+        @Test
+        fun findTokenBySecurityCode_tokenExpired() {
+            val recoveryExpiration = LocalDateTime.now().minusHours(3)
+            val token = IssueToken(account.id!!, "1234", recoveryExpiration, IssueType.FORGOT_PASSWORD)
+            repository.save(token)
+
+            restMockMvc.perform(get("$RESOURCE/code/{code}", token.securityCode)
+                    .accept(APPLICATION_JSON))
+                    .andExpect(status().isBadRequest)
+        }
 
         @Test
         fun forgotPassword_wrongEmail() {
@@ -116,11 +138,11 @@ class AccountPasswordForgotIT : AbstractIT() {
 
         @Test
         fun changePassword_tokenExpired() {
-            val recoveryExpiration =LocalDateTime.now().minusHours(3)
+            val recoveryExpiration = LocalDateTime.now().minusHours(3)
             val token = IssueToken(account.id!!, "1234", recoveryExpiration, IssueType.FORGOT_PASSWORD)
             val entityToken = repository.save(token)
             val newPassword = "newpassword"
-            val data = ForgotPasswordDto(entityToken.id!!, newPassword, entityToken.securityCode)
+            val data = ForgotPasswordDto(entityToken.id!!, newPassword)
 
             restMockMvc.perform(post("$RESOURCE/renew")
                     .accept(APPLICATION_JSON)
@@ -138,7 +160,7 @@ class AccountPasswordForgotIT : AbstractIT() {
             val token = IssueToken(account.id!!, "1234", type = IssueType.FORGOT_PASSWORD)
             val entityToken = repository.save(token)
             val newPassword = "newpassword"
-            val data = ForgotPasswordDto(entityToken.id!!, newPassword, "2678")
+            val data = ForgotPasswordDto(entityToken.id!!, newPassword)
 
             restMockMvc.perform(post("$RESOURCE/renew")
                     .accept(APPLICATION_JSON)

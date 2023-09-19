@@ -22,13 +22,13 @@ object IssuePolicies {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session not found")
         }
 
-        val pendency = issueTokenOptional.get()
+        val issueToken = issueTokenOptional.get()
 
-        if (pendency.type != IssueType.FORGOT_PASSWORD) {
+        if (issueToken.type != IssueType.FORGOT_PASSWORD) {
             return
         }
 
-        if (LocalDateTime.now().isAfter(pendency.recoveryExpiration)) {
+        if (LocalDateTime.now().isAfter(issueToken.recoveryExpiration)) {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session has been expired!")
         }
     }
@@ -38,13 +38,13 @@ object IssuePolicies {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session not found")
         }
 
-        val pendency = issueTokenOptional.get()
+        val issueToken = issueTokenOptional.get()
 
-        if (pendency.type != IssueType.TEMPORARY_PASSWORD) {
+        if (issueToken.type != IssueType.TEMPORARY_PASSWORD) {
             return
         }
 
-        if (LocalDateTime.now().isAfter(pendency.recoveryExpiration)) {
+        if (LocalDateTime.now().isAfter(issueToken.recoveryExpiration)) {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session has been expired!")
         }
     }
@@ -54,13 +54,13 @@ object IssuePolicies {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session not found")
         }
 
-        val pendency = issueTokenOptional.get()
+        val issueToken = issueTokenOptional.get()
 
-        if (pendency.type != IssueType.ACCOUNT_ACTIVATION) {
+        if (issueToken.type != IssueType.ACCOUNT_ACTIVATION) {
             return
         }
 
-        if (LocalDateTime.now().isAfter(pendency.recoveryExpiration)) {
+        if (LocalDateTime.now().isAfter(issueToken.recoveryExpiration)) {
             throw ResponseStatusException(BAD_REQUEST, "Password recovery session has been expired!")
         }
     }

@@ -37,6 +37,15 @@ class IssueService(
         return entityOptional.get()
     }
 
+    fun findForgotPasswordTokenBySecurityCode(securityCode: String): UUID {
+        val entityOptional = repository.findFirstBySecurityCodeAndType(securityCode, FORGOT_PASSWORD)
+        if (entityOptional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+        }
+        IssuePolicies.assertValidRecoveryPassword(entityOptional)
+        return entityOptional.get().id!!
+    }
+
     @Transactional
     fun createPendencyOfForgotPassword(email: String): IssueToken? {
         val entityAccountOptional = accountService.findByEmail(email)
@@ -56,10 +65,9 @@ class IssueService(
         return entityToken
     }
 
-
     @Transactional
-    fun resolvePasswordChange(tokenId: UUID, securityCode: String, password: String): Account? {
-        val entityTokenOptional = repository.findByIdAndSecurityCodeAndStatus(tokenId, securityCode)
+    fun resolvePasswordChange(tokenId: UUID, password: String): Account? {
+        val entityTokenOptional = repository.findByIdAndStatus(tokenId)
         IssuePolicies.assertValidRecoveryPassword(entityTokenOptional)
 
         val entityToken = entityTokenOptional.get()
@@ -165,6 +173,7 @@ class IssueService(
                 recoveryExpiration = LocalDateTime.now().plus(type.expirationTime),
                 type = type)
 
+        repository.closeIssues(entityAccount.id, type)
         return repository.save(token)
     }
 }

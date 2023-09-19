@@ -30,7 +30,7 @@ class IssueWebService(
     }
 
     fun resolveForgotPassword(data: ForgotPasswordDto): AccountDto {
-        val nullableEntity = service.resolvePasswordChange(data.tokenId, data.securityCode, data.password)
+        val nullableEntity = service.resolvePasswordChange(data.token, data.password)
         val entity: Account = assertNotFound(nullableEntity)
         return AccountDto(entity)
     }
@@ -55,5 +55,11 @@ class IssueWebService(
         val nullableEntity = service.forceResolveAccountActivation(accountId)
         val entity: AccountDto = assertNotFound(nullableEntity)
         return entity
+    }
+
+    fun getResetPasswordTokenBySecurityCode(data: ForgotPasswordSecurityCodeDto): ForgotPasswordTokenDto {
+        val nullableEntity = service.findForgotPasswordTokenBySecurityCode(data.securityCode)
+        val entity: UUID = assertNotFound(nullableEntity)
+        return ForgotPasswordTokenDto(entity)
     }
 }

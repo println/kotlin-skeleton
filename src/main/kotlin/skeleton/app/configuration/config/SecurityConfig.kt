@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT_ACTIVATION
 import skeleton.app.configuration.constants.Endpoints.AUTH
+import skeleton.app.configuration.constants.Endpoints.FORGOT_PASSWORD
 import skeleton.app.configuration.constants.Endpoints.MANAGEMENT
 import skeleton.app.support.access.account.AccountRole.*
 import skeleton.app.support.access.account.Permission.*
@@ -40,6 +41,8 @@ class SecurityConfig(
                             .requestMatchers(
                                     AntPathRequestMatcher("$AUTH/**"),
                                     AntPathRequestMatcher(ACCOUNT_ACTIVATION),
+                                    AntPathRequestMatcher(FORGOT_PASSWORD),
+                                    AntPathRequestMatcher("$FORGOT_PASSWORD/**"),
                                     AntPathRequestMatcher("/health"),
                                     AntPathRequestMatcher("/v3/api-docs"),
                                     AntPathRequestMatcher("/v3/api-docs.yaml"),

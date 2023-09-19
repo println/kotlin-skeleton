@@ -3,10 +3,7 @@ package skeleton.app.support.access.issue.web
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import skeleton.app.configuration.constants.Endpoints.FORGOT_PASSWORD
 
 
@@ -29,5 +26,13 @@ class ForgotPasswordController(
     ): ResponseEntity<Unit> {
         webService.resolveForgotPassword(data)
         return ResponseEntity(OK)
+    }
+
+    @GetMapping("/code/{code}")
+    fun findTokenBySecurityCode(
+            @PathVariable("code") code: String
+    ): ForgotPasswordTokenDto {
+        val data = ForgotPasswordSecurityCodeDto(code)
+        return webService.getResetPasswordTokenBySecurityCode(data)
     }
 }
