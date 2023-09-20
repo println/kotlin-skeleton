@@ -55,7 +55,6 @@ class AccountIssueIT : AbstractWebIT<IssueToken>() {
     @BeforeEach
     fun setup() {
         accountRepository.deleteAll()
-        repository.deleteAll()
         account = AccountIT.createAccount(encoder = passwordEncoder, repository = accountRepository)
     }
 
@@ -64,6 +63,7 @@ class AccountIssueIT : AbstractWebIT<IssueToken>() {
 
         @Test
         fun forgotPassword_idempotent() {
+            repository.deleteAll()
             val data = ForgotPasswordEmailDto(account.email)
             val mockMvc = getMvcBuilder(ForgotPasswordController(service)).build()
 
