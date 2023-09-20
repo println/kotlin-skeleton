@@ -25,7 +25,7 @@ abstract class AbstractIT: IntegrationTest() {
 
     abstract fun createResource(): Any
 
-    private fun getMvcBuilder(resource: Any): StandaloneMockMvcBuilder {
+    fun getMvcBuilder(resource: Any): StandaloneMockMvcBuilder {
         return MockMvcBuilders
                 .standaloneSetup(resource)
                 .apply { springSecurity() }
