@@ -22,5 +22,5 @@ interface IssueRepository : JpaRepository<IssueToken, UUID>, JpaSpecificationExe
 
     @Modifying
     @Query("update IssueToken i set i.status = CLOSED where i.accountId = :accountId and i.type = :type")
-    fun closeIssues(accountId: UUID, type: IssueType)
+    fun closeOlderIssues(accountId: UUID, type: IssueType): Int
 }

@@ -19,11 +19,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Service
-class IssueService(
-        private val repository: IssueRepository,
-        private val accountService: AccountService,
-        private val notifier: IssueNotifier
-) {
+class IssueService(private val repository: IssueRepository, private val accountService: AccountService, private val notifier: IssueNotifier) {
     fun findAll(filter: IssueFilter, pageable: Pageable): Page<IssueToken> {
         val specification: Specification<IssueToken> = Specification.where(null)
         return repository.findAll(specification, pageable)
@@ -57,9 +53,7 @@ class IssueService(
         val entityAccount = entityAccountOptional.get()
         assertValidAccount(entityAccount)
 
-        accountService.incrementIssues(entityAccount.id!!)
-
-        val entityToken = openPending(entityAccount, FORGOT_PASSWORD)
+        val entityToken = openPending(entityAccount.id!!, FORGOT_PASSWORD)
         notifier.notifyPasswordRecoveryRequested(entityToken, entityAccount)
 
         return entityToken
@@ -72,7 +66,6 @@ class IssueService(
 
         val entityToken = entityTokenOptional.get()
         val updatedEntityAccount = accountService.changePassword(entityToken.accountId, password)
-        accountService.decrementIssues(updatedEntityAccount.id!!)
 
         closePending(entityToken)
         notifier.notifyPasswordChanged(updatedEntityAccount)
@@ -85,9 +78,7 @@ class IssueService(
         val entityAccount = accountService.findById(accountId)
         assertValidAccount(entityAccount)
 
-        accountService.incrementIssues(accountId)
-
-        val entityToken = openPending(entityAccount, ACCOUNT_ACTIVATION)
+        val entityToken = openPending(entityAccount.id!!, ACCOUNT_ACTIVATION)
         notifier.notifyPasswordRecoveryRequested(entityToken, entityAccount)
 
         return entityToken
@@ -99,14 +90,13 @@ class IssueService(
 
         try {
             entityAccount = accountService.findById(accountId)
-        }catch (e:Exception){
+        } catch (e: Exception) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Id not found")
         }
 
         val tempPassword = accountService.assignNewTemporaryPassword(accountId)
-        accountService.incrementIssues(entityAccount.id!!)
 
-        val entityToken = openPending(entityAccount, TEMPORARY_PASSWORD)
+        val entityToken = openPending(entityAccount.id!!, TEMPORARY_PASSWORD)
         notifier.notifyYourAccountHasBeenPasswordResetToATemporaryPassword(entityToken, entityAccount)
 
         return tempPassword
@@ -119,8 +109,6 @@ class IssueService(
 
         val entityToken = entityTokenOptional.get()
         val updatedEntityAccount = accountService.changePassword(entityToken.accountId, password)
-
-        accountService.decrementIssues(updatedEntityAccount.id!!)
 
         closePending(entityToken)
         notifier.notifyPasswordChanged(updatedEntityAccount)
@@ -152,7 +140,6 @@ class IssueService(
 
     private fun resolveAccountActivation(entityToken: IssueToken): AccountDto {
         val entityAccount = accountService.findById(entityToken.accountId)
-        accountService.decrementIssues(entityAccount.id!!)
 
         closePending(entityToken)
         notifier.notifyAccountHasBeenActivated(entityAccount)
@@ -161,19 +148,20 @@ class IssueService(
     }
 
     private fun closePending(entityToken: IssueToken) {
+        accountService.decrementIssues(entityToken.accountId)
         entityToken.status = CLOSED
         repository.save(entityToken)
     }
 
-    private fun openPending(entityAccount: AccountDto, type: IssueType): IssueToken {
+    private fun openPending(accountId: UUID, type: IssueType): IssueToken {
         val securityCode = Generators.generateSecurityCode()
-        val token = IssueToken(
-                accountId = entityAccount.id!!,
-                securityCode = securityCode,
-                recoveryExpiration = LocalDateTime.now().plus(type.expirationTime),
-                type = type)
+        val token = IssueToken(accountId = accountId, securityCode = securityCode, recoveryExpiration = LocalDateTime.now().plus(type.expirationTime), type = type)
 
-        repository.closeIssues(entityAccount.id, type)
+        val rowsAffected = repository.closeOlderIssues(accountId, type)
+        repeat(rowsAffected) { accountService.decrementIssues(accountId) }
+
+        accountService.incrementIssues(accountId)
+
         return repository.save(token)
     }
 }
