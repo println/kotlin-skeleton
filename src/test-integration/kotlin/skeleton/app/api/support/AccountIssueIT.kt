@@ -12,16 +12,26 @@ import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountRepository
 import skeleton.app.support.access.issue.IssueRepository
 import skeleton.app.support.access.issue.IssueToken
+import skeleton.app.support.access.issue.IssueType
 import skeleton.app.support.access.issue.web.ForgotPasswordController
 import skeleton.app.support.access.issue.web.ForgotPasswordEmailDto
 import skeleton.app.support.access.issue.web.IssueController
 import skeleton.app.support.access.issue.web.IssueWebService
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
+import skeleton.app.support.functions.Generators
+import java.util.*
 
 class AccountIssueIT : AbstractWebIT<IssueToken>() {
 
     companion object {
         const val RESOURCE = ACCOUNT_ISSUE
+
+        fun generateIssue(accountId: UUID = UUID.randomUUID()): IssueToken {
+            return IssueToken(
+                    accountId = accountId,
+                    securityCode = Generators.generateSecurityCode(4),
+                    type = IssueType.ACCOUNT_ACTIVATION)
+        }
     }
 
     @Autowired

@@ -16,6 +16,10 @@ class AccountSessionIT : AbstractWebIT<Session>() {
     companion object {
         const val RESOURCE = SESSION
         var ACCOUNT: Account? = null
+
+        fun generateSession(account: Account): Session {
+            return Session(token = "xpto", account = account)
+        }
     }
 
     @Autowired
@@ -53,7 +57,7 @@ class AccountSessionIT : AbstractWebIT<Session>() {
     }
 
     @AfterEach
-    fun clear(){
+    fun clear() {
         accountRepository.deleteAll()
         repository.deleteAll()
     }

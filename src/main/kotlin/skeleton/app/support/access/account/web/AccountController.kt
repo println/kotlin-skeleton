@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT_
+import skeleton.app.support.access.AccountUser
 import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.account.AccountFilter
+import skeleton.app.support.access.account.AccountRole
+import skeleton.app.support.access.issue.IssueToken
+import skeleton.app.support.access.session.SessionDto
 import java.net.URI
 import java.util.*
 
@@ -31,11 +35,38 @@ class AccountController(
         return service.findAll(filter, pageable)
     }
 
+    @GetMapping("/roles")
+    @PreAuthorize("hasAuthority('admin:read')")
+    fun getEnumRoles(): Array<AccountRole> {
+        return AccountRole.values()
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('admin:read')")
     fun getById(
             @PathVariable("id") id: UUID): AccountDto {
         return service.findById(id)
+    }
+
+    @GetMapping("/{id}/sessions")
+    @PreAuthorize("hasAuthority('admin:read')")
+    fun getActiveSessions(
+            @PathVariable("id") id: UUID): Collection<SessionDto> {
+        return service.getActiveSessions(id)
+    }
+
+    @GetMapping("/{id}/issues")
+    @PreAuthorize("hasAuthority('admin:read')")
+    fun getOpenIssues(
+            @PathVariable("id") id: UUID): Collection<IssueToken> {
+        return service.getOpenIssues(id)
+    }
+
+    @GetMapping("/{id}/user")
+    @PreAuthorize("hasAuthority('admin:read')")
+    fun getUser(
+            @PathVariable("id") id: UUID): AccountUser {
+        return service.getUser(id)
     }
 
     @PostMapping
@@ -82,5 +113,4 @@ class AccountController(
             @PathVariable("id") id: UUID): AccountDto {
         return service.unblock(id)
     }
-
 }

@@ -30,7 +30,11 @@ class UserService(
     }
 
     override fun findByAccount(account: Account): User {
-        val entityOptional = repository.findFirstByAccountId(account.id!!)
+       return findByAccountId(account.id!!)
+    }
+
+    override fun findByAccountId(accountId: UUID): User {
+        val entityOptional = repository.findFirstByAccountId(accountId)
         if (entityOptional.isEmpty) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
         }

@@ -12,11 +12,11 @@ import skeleton.app.support.jpa.AuditableModel
 @Table(name = SESSION)
 data class Session(
         val token: String,
-        @Enumerated(EnumType.STRING)
-        val tokenType: TokenType = BEARER,
-        var revoked: Boolean,
-        var expired: Boolean,
         @ManyToOne
         @OnDelete(action = OnDeleteAction.CASCADE)
         val account: Account,
-): AuditableModel<Session>()
+        @Enumerated(EnumType.STRING)
+        val tokenType: TokenType = BEARER,
+        var revoked: Boolean = false,
+        var expired: Boolean = false,
+        ) : AuditableModel<Session>()

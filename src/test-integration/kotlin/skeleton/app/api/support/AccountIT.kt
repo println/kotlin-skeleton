@@ -1,6 +1,7 @@
 package skeleton.app.api.support
 
 import com.github.javafaker.Faker
+import org.hamcrest.Matchers.*
 import org.jeasy.random.EasyRandom
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -11,9 +12,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import skeleton.app.AbstractWebIT
 import skeleton.app.configuration.constants.Endpoints.ACCOUNT
+import skeleton.app.support.access.AccountUserService
 import skeleton.app.support.access.account.*
 import skeleton.app.support.access.account.web.*
+import skeleton.app.support.access.issue.IssueRepository
 import skeleton.app.support.access.login.Login
+import skeleton.app.support.access.session.SessionRepository
 import skeleton.app.support.extensions.ClassExtensions.toJsonString
 import skeleton.app.support.functions.Functions
 
@@ -27,6 +31,15 @@ class AccountIT : AbstractWebIT<Account>() {
 
     @Autowired
     private lateinit var service: AccountService
+
+    @Autowired
+    private lateinit var issueRepository: IssueRepository
+
+    @Autowired
+    private lateinit var sessionRepository: SessionRepository
+
+    @Autowired
+    private lateinit var accountUserService: AccountUserService
 
     override fun getRepository() = repository
     override fun getEntityType() = Account::class.java
@@ -76,7 +89,7 @@ class AccountIT : AbstractWebIT<Account>() {
     }
 
     @Test
-    fun updateRole(){
+    fun updateRole() {
         val entity = entities.first() as Account
         val data = RoleDto(AccountRole.ADMIN)
 
@@ -90,7 +103,7 @@ class AccountIT : AbstractWebIT<Account>() {
     }
 
     @Test
-    fun block(){
+    fun block() {
         val entity = entities.first() as Account
 
         restMockMvc
@@ -99,9 +112,10 @@ class AccountIT : AbstractWebIT<Account>() {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("\$.isEnabled").value(false))
     }
+
     @Test
-    fun unblock(){
-        val account  = generateAccount()
+    fun unblock() {
+        val account = generateAccount()
         account.status = AccountStatus.BLOCKED
         val entity = repository.save(account)
 
@@ -110,6 +124,70 @@ class AccountIT : AbstractWebIT<Account>() {
                         .accept(APPLICATION_JSON))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("\$.isEnabled").value(true))
+    }
+
+    @Test
+    fun getRoles() {
+        restMockMvc
+                .perform(get("$RESOURCE/roles")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$", hasSize<String>(AccountRole.values().size)))
+    }
+
+    @Test
+    fun getOpenIssues() {
+        val entity = entities.first() as Account
+        val repeat = 5
+
+        repeat(repeat) {
+            val issueToken = AccountIssueIT.generateIssue(entity.id!!)
+            issueRepository.save(issueToken).toString()
+        }
+
+        restMockMvc
+                .perform(get("$RESOURCE/{id}/issues", entity.id)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$", hasSize<String>(repeat)))
+    }
+
+    @Test
+    fun getActiveSessions() {
+        val entity = entities.first() as Account
+        val repeat = 5
+
+        repeat(repeat) {
+            val session = AccountSessionIT.generateSession(entity)
+            sessionRepository.save(session).toString()
+        }
+
+        restMockMvc
+                .perform(get("$RESOURCE/{id}/sessions", entity.id)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$", hasSize<String>(repeat)))
+    }
+
+    @Test
+    fun getUser() {
+        val entity = entities.first() as Account
+        val firstName = faker.name().firstName()
+        val lastName = faker.name().lastName()
+        accountUserService.create(entity, firstName, lastName)
+
+        restMockMvc
+                .perform(get("$RESOURCE/{id}/user", entity.id)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$").isNotEmpty)
+                .andExpect(jsonPath("$.firstName").value(firstName))
+                .andExpect(jsonPath("$.lastName").value(lastName))
+                .andExpect(jsonPath("$.accountId").value(entity.id.toString()))
+                .andExpect(jsonPath("$.id").isNotEmpty)
     }
 
     companion object {

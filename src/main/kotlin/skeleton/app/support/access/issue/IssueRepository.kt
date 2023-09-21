@@ -16,6 +16,8 @@ interface IssueRepository : JpaRepository<IssueToken, UUID>, JpaSpecificationExe
 
     fun findFirstByAccountIdAndStatus(accountId: UUID, status: IssueStatus = OPEN): Optional<IssueToken>
 
+    fun findAllByAccountIdAndStatus(accountId: UUID, status: IssueStatus = OPEN): List<IssueToken>
+
     fun existsByAccountId(accountId: UUID): Boolean
 
     fun findFirstBySecurityCodeAndType(securityCode: String, type: IssueType): Optional<IssueToken>

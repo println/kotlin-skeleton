@@ -36,6 +36,10 @@ class SessionService(
         return repository.findById(id).map { SessionDto(it) }
     }
 
+    fun getAllActiveByAccountId(id: UUID): Collection<SessionDto> {
+        return repository.findAllByAccountIdAndExpiredIsFalseAndRevokedIsFalse(id).map { SessionDto(it) }
+    }
+
     fun start(account: Account, jwtToken: String): SessionDto {
         val session = Session(
                 account = account,
@@ -65,4 +69,6 @@ class SessionService(
     fun findByToken(token: String): Optional<Session> {
         return repository.findByToken(token)
     }
+
+
 }

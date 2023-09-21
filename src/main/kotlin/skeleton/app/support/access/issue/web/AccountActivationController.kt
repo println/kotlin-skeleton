@@ -27,7 +27,7 @@ class AccountActivationController(
     }
 
     @GetMapping("/force/{accountId}")
-    @PreAuthorize("hasAuthority('admin:create')")
+    @PreAuthorize("hasAuthority('admin:update')")
     fun forceActivateAccount(
             @PathVariable("accountId") accountId: UUID
     ): ResponseEntity<Unit> {

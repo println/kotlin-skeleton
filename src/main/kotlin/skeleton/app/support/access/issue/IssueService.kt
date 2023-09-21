@@ -42,6 +42,10 @@ class IssueService(private val repository: IssueRepository, private val accountS
         return entityOptional.get().id!!
     }
 
+    fun getAllOpenByAccountId(accountId: UUID): Collection<IssueToken> {
+        return repository.findAllByAccountIdAndStatus(accountId)
+    }
+
     @Transactional
     fun createPendencyOfForgotPassword(email: String): IssueToken? {
         val entityAccountOptional = accountService.findByEmail(email)
@@ -164,4 +168,6 @@ class IssueService(private val repository: IssueRepository, private val accountS
 
         return repository.save(token)
     }
+
+
 }
