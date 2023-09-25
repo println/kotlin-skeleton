@@ -95,6 +95,29 @@ class AccountPasswordForgotIT : AbstractIT() {
     }
 
     @Test
+    fun changePasswordCloseTemporaryPassword() {
+        val tokenTemporaryPassword = IssueToken(account.id!!, "4321", LocalDateTime.now().plusDays(1), IssueType.TEMPORARY_PASSWORD)
+        val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD)
+        val entityToken = repository.save(token)
+        val entityTokenTemporaryPassword = repository.save(tokenTemporaryPassword)
+        val newPassword = "newpassword"
+        val data = ForgotPasswordDto(entityToken.id!!, newPassword)
+
+        assertEquals(2, repository.findAllByAccountIdAndStatus(account.id!!, OPEN).size)
+
+        restMockMvc.perform(post("$RESOURCE/renew")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(data.toJsonString()))
+                .andExpect(status().isOk)
+
+        account = accountService.authenticate(account.login.username, newPassword)
+        assertNotNull(repository.findFirstByAccountIdAndStatus(account.id!!, CLOSED).get())
+        assertEquals(CLOSED, repository.findById(entityTokenTemporaryPassword.id!!).get().status)
+        assertEquals(0, account.issues)
+    }
+
+    @Test
     fun findTokenBySecurityCode() {
         val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.FORGOT_PASSWORD)
         repository.save(token)
@@ -171,6 +194,16 @@ class AccountPasswordForgotIT : AbstractIT() {
             assertThrows<BadCredentialsException> {
                 accountService.authenticate(account.login.username, newPassword)
             }
+        }
+
+        @Test
+        fun changePassword_wrongSecurityCodeFromAnotherIssue() {
+            val token = IssueToken(account.id!!, "1234", LocalDateTime.now().plusDays(1), IssueType.ACCOUNT_ACTIVATION)
+            repository.save(token)
+
+            restMockMvc.perform(get("$RESOURCE/code/{code}", token.securityCode)
+                    .accept(APPLICATION_JSON))
+                    .andExpect(status().isBadRequest)
         }
     }
 }

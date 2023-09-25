@@ -59,7 +59,7 @@ class IssueWebService(
 
     fun getResetPasswordTokenBySecurityCode(data: ForgotPasswordSecurityCodeDto): ForgotPasswordTokenDto {
         val nullableEntity = service.findForgotPasswordTokenBySecurityCode(data.securityCode)
-        val entity: UUID = assertNotFound(nullableEntity)
+        val entity: UUID = assertBadRequest(nullableEntity)
         return ForgotPasswordTokenDto(entity)
     }
 }

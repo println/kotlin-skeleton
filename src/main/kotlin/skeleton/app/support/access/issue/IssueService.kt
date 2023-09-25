@@ -11,7 +11,6 @@ import skeleton.app.support.access.account.Account
 import skeleton.app.support.access.account.AccountDto
 import skeleton.app.support.access.account.AccountService
 import skeleton.app.support.access.issue.IssuePolicies.assertValidAccount
-import skeleton.app.support.access.issue.IssueStatus.*
 import skeleton.app.support.access.issue.IssueType.*
 import skeleton.app.support.access.issue.email.IssueNotifier
 import skeleton.app.support.functions.Generators
@@ -33,10 +32,10 @@ class IssueService(private val repository: IssueRepository, private val accountS
         return entityOptional.get()
     }
 
-    fun findForgotPasswordTokenBySecurityCode(securityCode: String): UUID {
+    fun findForgotPasswordTokenBySecurityCode(securityCode: String): UUID? {
         val entityOptional = repository.findFirstBySecurityCodeAndType(securityCode, FORGOT_PASSWORD)
         if (entityOptional.isEmpty) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found")
+            return null
         }
         IssuePolicies.assertValidRecoveryPassword(entityOptional)
         return entityOptional.get().id!!
@@ -152,21 +151,25 @@ class IssueService(private val repository: IssueRepository, private val accountS
     }
 
     private fun closePending(entityToken: IssueToken) {
-        accountService.decrementIssues(entityToken.accountId)
-        entityToken.status = CLOSED
-        repository.save(entityToken)
+        if(entityToken.type == FORGOT_PASSWORD){
+            closeOlder(entityToken.accountId, TEMPORARY_PASSWORD)
+        }
+        closeOlder(entityToken.accountId, entityToken.type)
     }
 
     private fun openPending(accountId: UUID, type: IssueType): IssueToken {
         val securityCode = Generators.generateSecurityCode()
         val token = IssueToken(accountId = accountId, securityCode = securityCode, recoveryExpiration = LocalDateTime.now().plus(type.expirationTime), type = type)
 
-        val rowsAffected = repository.closeOlderIssues(accountId, type)
-        repeat(rowsAffected) { accountService.decrementIssues(accountId) }
+        closeOlder(accountId, type)
 
         accountService.incrementIssues(accountId)
-
         return repository.save(token)
+    }
+
+    private fun closeOlder(accountId: UUID, type: IssueType){
+        val rowsAffected = repository.closeOlderIssues(accountId, type)
+        repeat(rowsAffected) { accountService.decrementIssues(accountId) }
     }
 
 
